@@ -42,18 +42,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           {p.title}
         </h1>
 
-        <p className="font-serif-italic mt-8 text-[var(--color-amber)]" style={{ fontSize: "24px" }}>
+        <p
+          className="font-serif-italic mt-8 text-[var(--color-amber)]"
+          style={{ fontSize: "24px" }}
+        >
           {p.excerpt}
         </p>
 
         <div className="mt-12 space-y-6 text-[var(--color-ivory2)] text-[16px] leading-relaxed">
           <p>
-            (Long-form body rendered from CMS rich-text. This wireframe stub demonstrates the
-            typographic rhythm: monospace body, serif italic pull-quote, ample negative space.)
-          </p>
-          <p>
-            Future Payload integration will hydrate this region with structured content blocks:
-            paragraphs, code, callouts, image grids.
+            Full article content will be available soon. This page demonstrates the typographic
+            rhythm and layout structure for long-form journal entries.
           </p>
         </div>
       </article>
