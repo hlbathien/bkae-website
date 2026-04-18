@@ -16,7 +16,7 @@ export default function CountUp({
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
-    const { gsap, ScrollTrigger } = ensureGsap();
+    const { gsap } = ensureGsap();
     const obj = { v: 0 };
     const fmt = new Intl.NumberFormat("en-US");
     const tween = gsap.to(obj, {
@@ -34,5 +34,9 @@ export default function CountUp({
       tween.kill();
     };
   }, [to, suffix, duration]);
-  return <span ref={ref} className={className}>0{suffix}</span>;
+  return (
+    <span ref={ref} className={className}>
+      0{suffix}
+    </span>
+  );
 }

@@ -14,7 +14,7 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
   useEffect(() => {
     if (!wrap.current || !stack.current) return;
     if (window.matchMedia("(max-width: 1024px)").matches) return;
-    const { gsap, ScrollTrigger } = ensureGsap();
+    const { gsap } = ensureGsap();
     const layers = stack.current.querySelectorAll<HTMLElement>("[data-layer]");
 
     const ctx = gsap.context(() => {
@@ -28,11 +28,7 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
         },
       });
       layers.forEach((l, i) => {
-        tl.to(
-          l,
-          { yPercent: -8 * (i + 1), xPercent: 4 * i, rotate: -3 + i * 2, ease: "none" },
-          0
-        );
+        tl.to(l, { yPercent: -8 * (i + 1), xPercent: 4 * i, rotate: -3 + i * 2, ease: "none" }, 0);
       });
     }, wrap);
 
@@ -64,7 +60,10 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
           </div>
           <div>
             <dt className="eyebrow mb-1">Outcome</dt>
-            <dd className="font-serif-italic text-[var(--color-amber)]" style={{ fontSize: "20px" }}>
+            <dd
+              className="font-serif-italic text-[var(--color-amber)]"
+              style={{ fontSize: "20px" }}
+            >
               {p.outcome}
             </dd>
           </div>
@@ -103,11 +102,7 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
       </div>
 
       <div className="lg:col-span-7">
-        <div
-          ref={stack}
-          className="relative aspect-[4/3] w-full"
-          style={{ perspective: "1400px" }}
-        >
+        <div ref={stack} className="relative aspect-[4/3] w-full" style={{ perspective: "1400px" }}>
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -132,10 +127,7 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
                     key={k}
                     className="h-1.5 rounded-sm"
                     style={{
-                      background:
-                        k % 13 === idx
-                          ? "var(--color-amber)"
-                          : "rgba(122,132,144,0.18)",
+                      background: k % 13 === idx ? "var(--color-amber)" : "rgba(122,132,144,0.18)",
                     }}
                   />
                 ))}

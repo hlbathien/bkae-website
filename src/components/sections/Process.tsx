@@ -11,7 +11,7 @@ export default function Process() {
   useEffect(() => {
     if (!section.current || !track.current) return;
     if (window.matchMedia("(max-width: 1024px)").matches) return;
-    const { gsap, ScrollTrigger } = ensureGsap();
+    const { gsap } = ensureGsap();
 
     const ctx = gsap.context(() => {
       const t = track.current!;
@@ -67,7 +67,10 @@ export default function Process() {
             A contract at every edge.
           </h2>
         </Frame>
-        <div ref={track} className="mt-16 inline-flex gap-24 pl-[var(--gutter)] pr-[20vw] will-change-transform">
+        <div
+          ref={track}
+          className="mt-16 inline-flex gap-24 pl-[var(--gutter)] pr-[20vw] will-change-transform"
+        >
           {processNodes.map((n, i) => (
             <div key={n.id} className="flex w-[60vw] flex-col">
               <span className="eyebrow">Stage {String(i + 1).padStart(2, "0")}</span>
@@ -79,12 +82,15 @@ export default function Process() {
               </span>
               <span className="mt-6 max-w-md text-[var(--color-steel-light)]">{n.desc}</span>
               {i < processNodes.length - 1 && (
-                <svg
-                  className="mt-10 h-px w-[40vw]"
-                  viewBox="0 0 100 1"
-                  preserveAspectRatio="none"
-                >
-                  <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="var(--color-amber)" strokeDasharray="2 4" />
+                <svg className="mt-10 h-px w-[40vw]" viewBox="0 0 100 1" preserveAspectRatio="none">
+                  <line
+                    x1="0"
+                    y1="0.5"
+                    x2="100"
+                    y2="0.5"
+                    stroke="var(--color-amber)"
+                    strokeDasharray="2 4"
+                  />
                 </svg>
               )}
             </div>

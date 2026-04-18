@@ -21,7 +21,7 @@ export default function RevealText({
   useEffect(() => {
     if (!ref.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const { gsap, ScrollTrigger } = ensureGsap();
+    const { gsap } = ensureGsap();
     const el = ref.current;
     const parts = el.querySelectorAll<HTMLElement>("[data-r]");
     gsap.set(parts, { yPercent: 110, opacity: 0, rotateX: -40 });
@@ -41,10 +41,7 @@ export default function RevealText({
     };
   }, [delay, splitBy]);
 
-  const tokens =
-    splitBy === "char"
-      ? children.split("")
-      : children.split(/(\s+)/);
+  const tokens = splitBy === "char" ? children.split("") : children.split(/(\s+)/);
 
   return createElement(
     as,
@@ -57,14 +54,10 @@ export default function RevealText({
       t.match(/^\s+$/) ? (
         <span key={i}>{t}</span>
       ) : (
-        <span
-          key={i}
-          data-r
-          style={{ display: "inline-block", willChange: "transform,opacity" }}
-        >
+        <span key={i} data-r style={{ display: "inline-block", willChange: "transform,opacity" }}>
           {t}
         </span>
-      )
-    )
+      ),
+    ),
   );
 }
