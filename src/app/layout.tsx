@@ -33,6 +33,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="bg-[var(--color-ink)] text-[var(--color-ivory)]">
       <body className="no-cursor antialiased">
+        <noscript>
+          <div
+            style={{
+              background: "var(--color-amber)",
+              color: "var(--color-ink)",
+              padding: "12px 20px",
+              textAlign: "center",
+              fontFamily: "var(--font-mono)",
+              fontSize: "13px",
+            }}
+          >
+            This website uses JavaScript for smooth scrolling and animations. Basic navigation works
+            without JavaScript, but some interactive features may be limited.
+          </div>
+        </noscript>
         <SmoothScroll>
           <a
             href="#main"
