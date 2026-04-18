@@ -17,9 +17,15 @@ export const metadata: Metadata = {
     "Inference is the Agentic Engineering club at HCMUT. We ship bounded, contract-based AI systems and teach the discipline behind them.",
   openGraph: {
     title: "Inference — Agentic Engineering at HCMUT",
-    description:
-      "Bounded LLMs. Contract-based pipelines. Shipped systems. Founded at HCMUT.",
+    description: "Bounded LLMs. Contract-based pipelines. Shipped systems. Founded at HCMUT.",
     type: "website",
+    images: [{ url: "/og.svg", width: 1200, height: 630, alt: "Inference — Agentic Engineering" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Inference — Agentic Engineering at HCMUT",
+    description: "Bounded LLMs. Contract-based pipelines. Shipped systems. Founded at HCMUT.",
+    images: ["/og.svg"],
   },
 };
 
