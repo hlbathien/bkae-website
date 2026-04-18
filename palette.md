@@ -14,20 +14,20 @@ Goal: start club at HCMUT (Ho Chi Minh City's largest Engineering School). Sprea
 
 Two things at once. Design must hold both:
 
-| Vibe Coding | Agentic Engineering |
-|---|---|
+| Vibe Coding               | Agentic Engineering                |
+| ------------------------- | ---------------------------------- |
 | Fast, intuitive, creative | Rigorous, contract-based, reliable |
-| Hackathon energy | Clinical-grade pipeline thinking |
-| First-year audacity | Production standards |
-| Irreverent | Institutional |
+| Hackathon energy          | Clinical-grade pipeline thinking   |
+| First-year audacity       | Production standards               |
+| Irreverent                | Institutional                      |
 
 Most clubs pick one lane. Edge: already proven both. Hackathon win on deterministic pipeline w/ bounded LLM = thesis, not contradiction. **Design embody synthesis.**
 
 ### Three Audiences
 
-1. **HCMUT students** — near-term conversion. Feel: *"ahead of me, want in that room."* Magnetic, not intimidating.
-2. **Faculty / institutional** — credibility. Feel: *"serious. not meme club."*
-3. **External pros / OpenAI / sponsors** — long game. Feel: *"institution producing Vietnam's frontier engineers."*
+1. **HCMUT students** — near-term conversion. Feel: _"ahead of me, want in that room."_ Magnetic, not intimidating.
+2. **Faculty / institutional** — credibility. Feel: _"serious. not meme club."_
+3. **External pros / OpenAI / sponsors** — long game. Feel: _"institution producing Vietnam's frontier engineers."_
 
 One system, all three, no pandering.
 
@@ -58,10 +58,10 @@ Closer to **technical journal from future** than startup landing page.
 Dark, near-black foundation + single high-luminance accent, surgical restraint.
 
 **Why amber, not other accent:**
-Amber = color of judgment — warning lights, editor highlights, terminal cursor. Between cold blue tech + red danger. Warm enough = *human intelligence in loop*. Precise = *serious craft*. For Vietnamese engineering institution, cultural resonance (gold, craft, earned status), not literal. Cyan/neon/electric blue burned through. Amber owns lane.
+Amber = color of judgment — warning lights, editor highlights, terminal cursor. Between cold blue tech + red danger. Warm enough = _human intelligence in loop_. Precise = _serious craft_. For Vietnamese engineering institution, cultural resonance (gold, craft, earned status), not literal. Cyan/neon/electric blue burned through. Amber owns lane.
 
 **Why obsidian, not white:**
-White = "startup landing page." Positioning *institutional* — MIT architecture lab, not YC demo day. Dark grounds authority. Amber hits like single lamp in dark room — undeniable, focal, precise.
+White = "startup landing page." Positioning _institutional_ — MIT architecture lab, not YC demo day. Dark grounds authority. Amber hits like single lamp in dark room — undeniable, focal, precise.
 
 ---
 
@@ -70,24 +70,24 @@ White = "startup landing page." Positioning *institutional* — MIT architecture
 Three-font hierarchy, distinct work:
 
 - **Syne 800** — display/headlines. Ultrawide, architectural. Designed for institutions that build things. Nothing fragile.
-- **Instrument Serif italic** — accent voice. Pull quotes, taglines, moments needing *feeling* not info. Serif/italic vs grotesque display = editorial tension.
-- **DM Mono** — body. Not because "code" club (avoid cliché) but monospace reads as *precision, not decoration*. Says: we measure things. Every char earns space.
+- **Instrument Serif italic** — accent voice. Pull quotes, taglines, moments needing _feeling_ not info. Serif/italic vs grotesque display = editorial tension.
+- **DM Mono** — body. Not because "code" club (avoid cliché) but monospace reads as _precision, not decoration_. Says: we measure things. Every char earns space.
 
 ---
 
 ## Key Design Aspects
 
 **1. Landing Page = Argument, not Brochure**
-Not selling features. Making claim: *workflow changed, institution exists because of that.* Hero = thesis as single typographically overwhelming statement → prove w/ projects below.
+Not selling features. Making claim: _workflow changed, institution exists because of that._ Hero = thesis as single typographically overwhelming statement → prove w/ projects below.
 
 **2. Project Cards = Primary Credibility**
-Hackathon win + clinical pipeline = *evidence*, not portfolio items. Each card: hard engineering decision, constraint, outcome. Not screenshots + tags.
+Hackathon win + clinical pipeline = _evidence_, not portfolio items. Each card: hard engineering decision, constraint, outcome. Not screenshots + tags.
 
 **3. Motion = Precision, not Spectacle**
 No particle effects, floating gradients, mouse-trail glows ("we watched WebGL tutorial"). Use: staggered text reveals on scroll, amber cursor accents, numbers counting up on stats enter view. Feel like process running, not show playing.
 
 **4. Negative Space = Conviction**
-Overcrowded = insecurity. Have two real projects. Give room. Dark space on obsidian reads as *confidence in what's there*.
+Overcrowded = insecurity. Have two real projects. Give room. Dark space on obsidian reads as _confidence in what's there_.
 
 **5. CTA Hierarchy**
 Three paths in priority: (1) **View open-source projects** → near-term credibility through shipped work, (2) **Read engineering blog** → discipline-definers, (3) **Join waitlist** → recruit later. Don't mix visually. Hierarchy everything.
@@ -100,34 +100,34 @@ HCMUT students mostly mobile. Syne 800 + DM Mono body — test at 375px. Syne co
 ## Palette Tokens (from palette_analysis.html)
 
 ```css
-:root{
-  --ink:#0C0C09;
-  --ink2:#1A1A15;
-  --ink3:#282820;
-  --amber:#D4870A;
-  --amber-hot:#F0A020;
-  --amber-pale:#FDE8B8;
-  --ivory:#F5F0E8;
-  --ivory2:#EDE8DC;
-  --steel:#7A8490;
-  --steel-light:#B2BBC4;
+:root {
+  --ink: #0c0c09;
+  --ink2: #1a1a15;
+  --ink3: #282820;
+  --amber: #d4870a;
+  --amber-hot: #f0a020;
+  --amber-pale: #fde8b8;
+  --ivory: #f5f0e8;
+  --ivory2: #ede8dc;
+  --steel: #7a8490;
+  --steel-light: #b2bbc4;
 }
 ```
 
 ### Swatches
 
-| Name | Hex | Role |
-|---|---|---|
-| Obsidian | `#0C0C09` | Primary background |
-| Deep Ink | `#1A1A15` | Surface 1 |
-| Surface | `#282820` | Surface 2 / borders |
-| Signal Amber | `#D4870A` | Accent base |
-| Hot Amber | `#F0A020` | Accent hot / hover |
-| Amber Pale | `#FDE8B8` | Amber text on amber |
-| Ivory | `#F5F0E8` | Primary text |
-| Ivory2 | `#EDE8DC` | Secondary text |
-| Steel | `#7A8490` | Metadata |
-| Steel Light | `#B2BBC4` | Muted text |
+| Name         | Hex       | Role                |
+| ------------ | --------- | ------------------- |
+| Obsidian     | `#0C0C09` | Primary background  |
+| Deep Ink     | `#1A1A15` | Surface 1           |
+| Surface      | `#282820` | Surface 2 / borders |
+| Signal Amber | `#D4870A` | Accent base         |
+| Hot Amber    | `#F0A020` | Accent hot / hover  |
+| Amber Pale   | `#FDE8B8` | Amber text on amber |
+| Ivory        | `#F5F0E8` | Primary text        |
+| Ivory2       | `#EDE8DC` | Secondary text      |
+| Steel        | `#7A8490` | Metadata            |
+| Steel Light  | `#B2BBC4` | Muted text          |
 
 ### Emotional Signal Per Role
 
@@ -138,13 +138,13 @@ HCMUT students mostly mobile. Syne 800 + DM Mono body — test at 375px. Syne co
 
 ### Personality Spectrum (Inference position)
 
-| Axis | Position |
-|---|---|
-| Hype → Rigorous | 85% Rigorous |
-| Cold → Warm | 55% Warm |
-| Minimal → Rich | 65% Rich |
+| Axis                    | Position          |
+| ----------------------- | ----------------- |
+| Hype → Rigorous         | 85% Rigorous      |
+| Cold → Warm             | 55% Warm          |
+| Minimal → Rich          | 65% Rich          |
 | Playful → Authoritative | 75% Authoritative |
-| Generic → Distinctive | 90% Distinctive |
+| Generic → Distinctive   | 90% Distinctive   |
 
 ### Type Samples
 
@@ -160,9 +160,9 @@ HCMUT students mostly mobile. Syne 800 + DM Mono body — test at 375px. Syne co
 
 ### Vs Competitors
 
-| Style | Signal |
-|---|---|
+| Style                | Signal                        |
+| -------------------- | ----------------------------- |
 | Purple gradient club | AI hype, generic, forgettable |
-| Corporate navy club | Stiff, consulting-firm energy |
-| Neon green hacker | CTF club, not institution |
-| **Inference (you)** | **Precise, serious, alive** |
+| Corporate navy club  | Stiff, consulting-firm energy |
+| Neon green hacker    | CTF club, not institution     |
+| **Inference (you)**  | **Precise, serious, alive**   |

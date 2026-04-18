@@ -33,17 +33,41 @@ export default function Footer() {
           <div>
             <p className="eyebrow mb-3">Sitemap</p>
             <ul className="space-y-2 text-[var(--color-ivory2)]">
-              <li><Link href="/projects" className="draw-underline">Projects</Link></li>
-              <li><Link href="/journal" className="draw-underline">Journal</Link></li>
-              <li><Link href="/manifesto" className="draw-underline">Manifesto</Link></li>
-              <li><Link href="/join" className="draw-underline">Join</Link></li>
+              <li>
+                <Link href="/projects" className="draw-underline">
+                  Projects
+                </Link>
+              </li>
+              <li>
+                <Link href="/journal" className="draw-underline">
+                  Journal
+                </Link>
+              </li>
+              <li>
+                <Link href="/manifesto" className="draw-underline">
+                  Manifesto
+                </Link>
+              </li>
+              <li>
+                <Link href="/join" className="draw-underline">
+                  Join
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <p className="eyebrow mb-3">Contact</p>
             <ul className="space-y-2 text-[var(--color-ivory2)]">
-              <li><a className="draw-underline" href="mailto:hello@inference.club">hello@inference.club</a></li>
-              <li><a className="draw-underline" href="https://github.com/inference-club">github/inference-club</a></li>
+              <li>
+                <a className="draw-underline" href="mailto:hello@inference.club">
+                  hello@inference.club
+                </a>
+              </li>
+              <li>
+                <a className="draw-underline" href="https://github.com/inference-club">
+                  github/inference-club
+                </a>
+              </li>
             </ul>
           </div>
           <div>
@@ -58,7 +82,10 @@ export default function Footer() {
 
         <div className="mt-16 flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-[var(--color-steel)]">
           <span>
-            Crafted in <span className="font-serif-italic text-[var(--color-amber)] normal-case">Ho Chi Minh City</span>
+            Crafted in{" "}
+            <span className="font-serif-italic text-[var(--color-amber)] normal-case">
+              Ho Chi Minh City
+            </span>
           </span>
           <Clock />
         </div>

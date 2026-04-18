@@ -28,10 +28,8 @@ export default function Cursor() {
       dy = my;
       rx += (mx - rx) * 0.18;
       ry += (my - ry) * 0.18;
-      if (dot.current)
-        dot.current.style.transform = `translate3d(${dx - 3}px, ${dy - 3}px, 0)`;
-      if (ring.current)
-        ring.current.style.transform = `translate3d(${rx - 16}px, ${ry - 16}px, 0)`;
+      if (dot.current) dot.current.style.transform = `translate3d(${dx - 3}px, ${dy - 3}px, 0)`;
+      if (ring.current) ring.current.style.transform = `translate3d(${rx - 16}px, ${ry - 16}px, 0)`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

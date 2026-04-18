@@ -30,7 +30,7 @@ export default function Header() {
           "fixed left-0 right-0 top-9 z-40 transition-[height,background] duration-300",
           shrunk
             ? "h-14 bg-[rgba(12,12,9,0.7)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
-            : "h-20 bg-transparent"
+            : "h-20 bg-transparent",
         )}
       >
         <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)]">
@@ -68,11 +68,7 @@ export default function Header() {
             >
               Join
             </Link>
-            <button
-              aria-label="Open menu"
-              className="md:hidden"
-              onClick={() => setOpen(true)}
-            >
+            <button aria-label="Open menu" className="md:hidden" onClick={() => setOpen(true)}>
               <Menu size={20} />
             </button>
           </div>

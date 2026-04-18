@@ -20,9 +20,7 @@ export default function GridOverlay() {
               key={i}
               className="border-l"
               style={{
-                borderColor: debug
-                  ? "rgba(212,135,10,0.25)"
-                  : "rgba(122,132,144,0.06)",
+                borderColor: debug ? "rgba(212,135,10,0.25)" : "rgba(122,132,144,0.06)",
               }}
             />
           ))}

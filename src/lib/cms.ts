@@ -39,7 +39,10 @@ export type Announcement = {
 };
 
 export const announcements: Announcement[] = [
-  { text: "2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025", href: "/journal/qwen-hackathon" },
+  {
+    text: "2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025",
+    href: "/journal/qwen-hackathon",
+  },
   { text: "Now accepting founding-cohort applications", href: "/join" },
   { text: "New essay — Bounded LLMs, Unbounded Systems", href: "/journal" },
 ];
@@ -50,7 +53,8 @@ export const projects: Project[] = [
     index: "01",
     title: "Lumen — Multimodal Journal Engine",
     eyebrow: "01 / Project",
-    problem: "Personal journals lose context across modalities — photos, voice, text live in silos.",
+    problem:
+      "Personal journals lose context across modalities — photos, voice, text live in silos.",
     constraint: "Async pipeline only. Bounded LLM scope. Pure functions for tags & memory I/O.",
     outcome: "2nd place — Best Use of Qwen, Vietnam's largest GenAI Hackathon (200+ teams).",
     stack: ["Qwen-VL", "Next.js", "Postgres + pgvector", "Whisper", "Inngest"],
@@ -68,7 +72,8 @@ export const projects: Project[] = [
     title: "Atlas — Traceable Clinical Handoff",
     eyebrow: "02 / Project",
     problem: "Patients get lab PDFs. Doctors get noise. Nobody gets traceable summaries.",
-    constraint: "Deterministic contract pipeline. LLM confined to bounded explanation. Refuses unsupported claims.",
+    constraint:
+      "Deterministic contract pipeline. LLM confined to bounded explanation. Refuses unsupported claims.",
     outcome: "Surfaces uncertainty by default. Used by 3 clinicians in pilot.",
     stack: ["Qwen", "Pydantic", "FastAPI", "PDF.js", "Postgres"],
     stats: [

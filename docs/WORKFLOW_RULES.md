@@ -5,6 +5,7 @@
 Audience: GLM-5 (or equivalent) coding agent running unattended on `C:\bkae-website\`.
 
 Authority order (highest → lowest):
+
 1. Explicit human instruction in current prompt
 2. `docs/SOURCE_OF_TRUTH.md`
 3. `docs/BUILDING_PLAN.md`
@@ -36,6 +37,7 @@ If conflict between (2) and code → fix code. Conflict between (1) and (2) → 
 ## R4. Commands you may run unattended
 
 Allowed:
+
 - `pnpm install`, `pnpm add -D <devdep>` (only if R3 satisfied)
 - `pnpm exec tsc --noEmit`
 - `pnpm exec next build`
@@ -45,6 +47,7 @@ Allowed:
 - `rtk` prefixed equivalents of all the above
 
 Forbidden without explicit per-call human approval:
+
 - `git push`, `git reset --hard`, `git rebase`, `git checkout -- .`, `git clean`
 - `pnpm publish`, `npm publish`
 - `rm -rf`, deleting any file outside `node_modules/`, `.next/`, `docs/reports/`
@@ -76,6 +79,7 @@ Stop work and write a single entry to `docs/BLOCKED.md` if any:
 - You are about to do anything in R4 forbidden list
 
 Entry format:
+
 ```
 ## YYYY-MM-DD HH:MM — Phase N — <short title>
 - What I tried: ...
@@ -105,9 +109,10 @@ Run a 30-second invariant check at the start and end of every task.
 ## R10. Reduced-motion contract
 
 Every `useEffect` that animates **must** start with:
+
 ```ts
-if (typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+  return;
 ```
 
 If this guard is missing in any new motion code → phase incomplete.
@@ -134,6 +139,7 @@ Then commit per R5.
 ## R13. Hard stop conditions (must halt agent)
 
 Halt if any:
+
 - `BLOCKED.md` has unresolved entry
 - Two consecutive build failures from agent edits
 - Network unreachable for `pnpm install`

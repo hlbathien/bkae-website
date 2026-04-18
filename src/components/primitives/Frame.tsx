@@ -6,9 +6,7 @@ export default function Frame({
   className?: string;
 }) {
   return (
-    <section
-      className={`mx-auto max-w-[1600px] px-[var(--gutter)] ${className}`}
-    >
+    <section className={`mx-auto max-w-[1600px] px-[var(--gutter)] ${className}`}>
       {children}
     </section>
   );

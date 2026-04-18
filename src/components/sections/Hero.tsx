@@ -4,7 +4,8 @@ import MarqueeRow from "@/components/motion/MarqueeRow";
 import Frame from "@/components/primitives/Frame";
 import Link from "next/link";
 
-const KEYWORDS = "VIBE CODING · DETERMINISTIC · BOUNDED · SHIP · MEASURE · TRACEABLE · REFUSABLE · ";
+const KEYWORDS =
+  "VIBE CODING · DETERMINISTIC · BOUNDED · SHIP · MEASURE · TRACEABLE · REFUSABLE · ";
 
 export default function Hero() {
   return (
@@ -40,7 +41,10 @@ export default function Hero() {
       <Frame className="relative z-10">
         <p className="eyebrow mb-6">[ Inference · HCMUT · Founded 2026 ]</p>
 
-        <h1 className="font-display text-[var(--color-ivory)]" style={{ fontSize: "clamp(48px, 9vw, 168px)" }}>
+        <h1
+          className="font-display text-[var(--color-ivory)]"
+          style={{ fontSize: "clamp(48px, 9vw, 168px)" }}
+        >
           <RevealText splitBy="char">AGENTIC</RevealText>
           <br />
           <RevealText
@@ -51,9 +55,13 @@ export default function Hero() {
           >
             engineering
           </RevealText>{" "}
-          <RevealText splitBy="char" delay={0.25}>FOR THE</RevealText>
+          <RevealText splitBy="char" delay={0.25}>
+            FOR THE
+          </RevealText>
           <br />
-          <RevealText splitBy="char" delay={0.35}>INEVITABLE.</RevealText>
+          <RevealText splitBy="char" delay={0.35}>
+            INEVITABLE.
+          </RevealText>
         </h1>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.22em] text-[var(--color-ivory2)]">

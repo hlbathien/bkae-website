@@ -4,10 +4,7 @@ import RevealText from "@/components/motion/RevealText";
 
 export default function Manifesto() {
   return (
-    <section
-      id="manifesto"
-      className="relative flex min-h-[80svh] items-center py-32"
-    >
+    <section id="manifesto" className="relative flex min-h-[80svh] items-center py-32">
       <span
         aria-hidden
         className="font-display absolute left-2 top-10 text-[var(--color-amber)] opacity-[0.12]"
@@ -30,7 +27,8 @@ export default function Manifesto() {
           style={{ fontSize: "clamp(34px, 5.6vw, 88px)", lineHeight: 1.05 }}
         >
           <RevealText>
-            We don&apos;t teach AI. We institutionalize the engineering discipline AI-native software demands.
+            We don&apos;t teach AI. We institutionalize the engineering discipline AI-native
+            software demands.
           </RevealText>
         </h2>
       </Frame>

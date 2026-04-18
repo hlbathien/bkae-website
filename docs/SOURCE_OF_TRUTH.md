@@ -29,28 +29,28 @@
 
 ### 4.1 Palette (CSS vars; defined in `globals.css @theme`)
 
-| Token | Hex | Use |
-|---|---|---|
-| `--color-ink` | `#0C0C09` | Page bg |
-| `--color-ink2` | `#1A1A15` | Card bg |
-| `--color-ink3` | `#282820` | Borders, dividers |
-| `--color-amber` | `#D4870A` | Primary accent, CTAs, links |
-| `--color-amber-hot` | `#F0A020` | Hover state, highlights |
-| `--color-amber-pale` | `#FDE8B8` | Subtle washes |
-| `--color-ivory` | `#F5F0E8` | Headlines |
-| `--color-ivory2` | `#EDE8DC` | Body |
-| `--color-steel` | `#7A8490` | Meta text |
-| `--color-steel-light` | `#B2BBC4` | Secondary body |
+| Token                 | Hex       | Use                         |
+| --------------------- | --------- | --------------------------- |
+| `--color-ink`         | `#0C0C09` | Page bg                     |
+| `--color-ink2`        | `#1A1A15` | Card bg                     |
+| `--color-ink3`        | `#282820` | Borders, dividers           |
+| `--color-amber`       | `#D4870A` | Primary accent, CTAs, links |
+| `--color-amber-hot`   | `#F0A020` | Hover state, highlights     |
+| `--color-amber-pale`  | `#FDE8B8` | Subtle washes               |
+| `--color-ivory`       | `#F5F0E8` | Headlines                   |
+| `--color-ivory2`      | `#EDE8DC` | Body                        |
+| `--color-steel`       | `#7A8490` | Meta text                   |
+| `--color-steel-light` | `#B2BBC4` | Secondary body              |
 
 **Rule:** No raw hex in components. Use tokens.
 
 ### 4.2 Typography
 
-| Role | Family | Weight | Source |
-|---|---|---|---|
-| Display | Syne | 800 | Google Fonts |
+| Role          | Family           | Weight     | Source       |
+| ------------- | ---------------- | ---------- | ------------ |
+| Display       | Syne             | 800        | Google Fonts |
 | Accent italic | Instrument Serif | 400 italic | Google Fonts |
-| Body / mono | DM Mono | 400 / 500 | Google Fonts |
+| Body / mono   | DM Mono          | 400 / 500  | Google Fonts |
 
 Loaded via `@import` in `globals.css`. Helpers: `.font-display`, `.font-serif-italic`, default mono.
 
@@ -121,16 +121,24 @@ Types are source of truth. Match exactly.
 
 ```ts
 type Project = {
-  slug: string; title: string; eyebrow: string;
-  problem: string; constraint: string; outcome: string;
+  slug: string;
+  title: string;
+  eyebrow: string;
+  problem: string;
+  constraint: string;
+  outcome: string;
   stack: string[];
   stats: { label: string; value: number; suffix?: string }[];
   links: { github?: string; demo?: string; paper?: string };
 };
 
 type Post = {
-  slug: string; title: string; excerpt: string;
-  category: string; readingTime: string; publishedAt: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  readingTime: string;
+  publishedAt: string;
 };
 
 type Member = { name: string; role: string; year?: string };
@@ -152,18 +160,23 @@ Required projects in v1: `lumen-journal`, `atlas-clinical`.
 7. CTABands (3 bands: Apply / Read manifesto / Browse work)
 
 ### `/projects` Index
+
 Cards w/ hover → border amber.
 
 ### `/projects/[slug]`
+
 Async `params` (Next 15). `generateStaticParams` + `generateMetadata`. Layout: title block + 8/4 grid (problem/constraint/outcome | stack/stats/links).
 
 ### `/journal` Index, `/journal/[slug]` Detail
+
 Same async params pattern. Stub long-form body.
 
 ### `/manifesto`
+
 Four pillars from `PILLARS` const.
 
 ### `/join`
+
 Client form: full name, HCMUT email, year/major, what shipped (textarea). Validated via `react-hook-form + zod`. Submission: POST to `/api/join` (v1 = stub returning 200).
 
 ## 10. Accessibility
@@ -177,13 +190,13 @@ Client form: full name, HCMUT email, year/major, what shipped (textarea). Valida
 
 ## 11. Performance Budgets
 
-| Metric | Budget |
-|---|---|
-| LCP (mobile, slow 4G) | ≤ 2.5s |
-| CLS | ≤ 0.05 |
-| INP | ≤ 200ms |
-| JS shipped to landing | ≤ 220 KB gz |
-| Total transfer landing | ≤ 900 KB |
+| Metric                 | Budget      |
+| ---------------------- | ----------- |
+| LCP (mobile, slow 4G)  | ≤ 2.5s      |
+| CLS                    | ≤ 0.05      |
+| INP                    | ≤ 200ms     |
+| JS shipped to landing  | ≤ 220 KB gz |
+| Total transfer landing | ≤ 900 KB    |
 
 Verify with `next build` route summary + Lighthouse mobile.
 
