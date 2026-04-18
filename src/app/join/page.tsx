@@ -1,9 +1,58 @@
 "use client";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import Frame from "@/components/primitives/Frame";
+
+const schema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email").refine((v) => v.endsWith("@hcmut.edu.vn"), {
+    message: "Must be a valid HCMUT email (@hcmut.edu.vn)",
+  }),
+  year: z.string().min(1, "Year / Major is required"),
+  shipped: z.string().min(40, "Please write at least 40 characters about what you have shipped"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export default function JoinPage() {
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  async function onSubmit(data: FormData) {
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        setSent(true);
+      } else {
+        const result = await res.json();
+        if (result.errors) {
+          (Object.keys(result.errors) as Array<keyof FormData>).forEach((field) => {
+            setError(field, { message: result.errors[field] });
+          });
+        } else {
+          setSubmitError("Something went wrong. Please try again.");
+        }
+      }
+    } catch {
+      setSubmitError("Network error. Please try again.");
+    }
+  }
 
   return (
     <Frame className="pt-40 pb-32">
@@ -18,7 +67,8 @@ export default function JoinPage() {
       </h1>
 
       <p className="mt-10 max-w-xl text-[var(--color-steel-light)]">
-        We are building the Agentic Engineering institution at HCMUT. Founding cohort opens by application. Tell us what you have shipped, what you want to ship, and why this room.
+        We are building the Agentic Engineering institution at HCMUT. Founding cohort opens by
+        application. Tell us what you have shipped, what you want to ship, and why this room.
       </p>
 
       {sent ? (
@@ -29,30 +79,54 @@ export default function JoinPage() {
           </p>
         </div>
       ) : (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSent(true);
-          }}
-          className="mt-16 grid max-w-2xl gap-6"
-        >
-          <Field label="Full name" name="name" />
-          <Field label="HCMUT email" name="email" type="email" />
-          <Field label="Year / Major" name="year" />
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-16 grid max-w-2xl gap-6">
+          <Field
+            label="Full name"
+            name="name"
+            register={register}
+            error={errors.name?.message}
+          />
+          <Field
+            label="HCMUT email"
+            name="email"
+            type="email"
+            register={register}
+            error={errors.email?.message}
+          />
+          <Field
+            label="Year / Major"
+            name="year"
+            register={register}
+            error={errors.year?.message}
+          />
           <div>
-            <label className="eyebrow mb-2 block">What have you shipped?</label>
+            <label htmlFor="shipped" className="eyebrow mb-2 block">
+              What have you shipped?
+            </label>
             <textarea
-              required
+              id="shipped"
               rows={4}
-              name="shipped"
+              {...register("shipped")}
+              aria-describedby={errors.shipped ? "shipped-error" : undefined}
               className="w-full bg-[var(--color-ink2)] border border-[var(--color-ink3)] p-4 text-[var(--color-ivory)] focus:border-[var(--color-amber)] focus:outline-none"
             />
+            {errors.shipped && (
+              <p id="shipped-error" className="mt-1 text-sm text-[var(--color-amber)]">
+                {errors.shipped.message}
+              </p>
+            )}
           </div>
+
+          {submitError && (
+            <p className="text-sm text-[var(--color-amber)]">{submitError}</p>
+          )}
+
           <button
             type="submit"
-            className="cta-fill mt-4 inline-flex w-fit items-center gap-3 border border-[var(--color-amber)] px-6 py-4 text-[12px] uppercase tracking-[0.22em] text-[var(--color-amber)]"
+            disabled={isSubmitting}
+            className="cta-fill mt-4 inline-flex w-fit items-center gap-3 border border-[var(--color-amber)] px-6 py-4 text-[12px] uppercase tracking-[0.22em] text-[var(--color-amber)] disabled:opacity-50"
           >
-            Submit application →
+            {isSubmitting ? "Submitting..." : "Submit application →"}
           </button>
         </form>
       )}
@@ -64,11 +138,16 @@ function Field({
   label,
   name,
   type = "text",
+  register,
+  error,
 }: {
   label: string;
-  name: string;
+  name: keyof FormData;
   type?: string;
+  register: ReturnType<typeof useForm<FormData>>["register"];
+  error?: string;
 }) {
+  const errorId = `${name}-error`;
   return (
     <div>
       <label htmlFor={name} className="eyebrow mb-2 block">
@@ -76,11 +155,16 @@ function Field({
       </label>
       <input
         id={name}
-        name={name}
         type={type}
-        required
+        {...register(name)}
+        aria-describedby={error ? errorId : undefined}
         className="w-full bg-[var(--color-ink2)] border border-[var(--color-ink3)] p-4 text-[var(--color-ivory)] focus:border-[var(--color-amber)] focus:outline-none"
       />
+      {error && (
+        <p id={errorId} className="mt-1 text-sm text-[var(--color-amber)]">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
