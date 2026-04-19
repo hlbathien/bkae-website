@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LogoMark from "@/components/primitives/LogoMark";
 
 const NAV = [
   { href: "/projects", label: "Projects" },
@@ -38,7 +39,7 @@ export default function Header() {
             href="/"
             className="font-display flex items-center gap-2 text-[18px] tracking-tight text-[var(--color-ivory)]"
           >
-            {/* LogoMark slot */}
+            <LogoMark size={14} className="text-[var(--color-amber)]" />
             <span>agentic engineering<span className="text-[var(--color-amber)]">.</span></span>
           </Link>
 

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import LogoMark from "@/components/primitives/LogoMark";
 
 /**
  * PageTransition
@@ -62,15 +63,34 @@ export default function PageTransition() {
               [ agentic engineering · v1 · 2026 ]
             </div>
             <div
-              className="font-display text-[var(--color-ivory)]"
+              className="font-display text-[var(--color-ivory)] flex flex-col items-center gap-8"
               style={{
-                fontSize: "clamp(48px, 14vw, 200px)",
-                letterSpacing: "-0.04em",
-                lineHeight: 0.9,
                 animation: "introFade 700ms ease 240ms both",
               }}
             >
-              AGENTIC ENGINEERING<span className="text-[var(--color-amber)]">.</span>
+              <div 
+                className="logo-mark-draw flex items-center justify-center text-[var(--color-amber)]"
+                style={{ 
+                  animation: "introStroke 480ms ease 240ms both",
+                  '--draw-length': '3800'
+                } as React.CSSProperties}
+              >
+                <LogoMark size={80} style={{
+                  fill: "transparent",
+                  stroke: "currentColor",
+                  strokeWidth: "8px",
+                  strokeDasharray: "var(--draw-length)",
+                  strokeDashoffset: "var(--draw-length)"
+                }} />
+              </div>
+              <div style={{
+                fontSize: "clamp(48px, 14vw, 200px)",
+                letterSpacing: "-0.04em",
+                lineHeight: 0.9,
+                textAlign: "center"
+              }}>
+                AGENTIC ENGINEERING<span className="text-[var(--color-amber)]">.</span>
+              </div>
             </div>
             <div
               className="relative h-[1px] w-48 overflow-hidden bg-[var(--color-ink3)]"
@@ -109,6 +129,26 @@ export default function PageTransition() {
           0% { opacity: 0; }
           40% { opacity: 1; }
           100% { opacity: 0; }
+        }
+        @keyframes introStroke {
+          from {
+            stroke-dashoffset: var(--draw-length);
+            fill: transparent;
+          }
+          to {
+            stroke-dashoffset: 0;
+            fill: currentColor;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .logo-mark-draw {
+            animation: introFade 80ms ease both !important;
+          }
+          .logo-mark-draw svg {
+            fill: currentColor !important;
+            stroke-dasharray: none !important;
+            stroke-dashoffset: 0 !important;
+          }
         }
       `}</style>
     </>

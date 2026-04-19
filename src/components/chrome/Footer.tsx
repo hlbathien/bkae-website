@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { ensureGsap } from "@/lib/gsap";
+import LogoMark from "@/components/primitives/LogoMark";
 
 function Clock() {
   const ref = useRef<HTMLSpanElement>(null);
@@ -58,7 +59,10 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-[var(--gutter)] pt-[var(--space-section-sm)] pb-10">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <p className="eyebrow mb-3">Agentic Engineering</p>
+            <p className="eyebrow mb-3 flex items-center gap-2">
+              <LogoMark size={10} className="text-[var(--color-amber)]" />
+              Agentic Engineering
+            </p>
             <p className="text-[var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-steel-light)] max-w-xs">
               Agentic Engineering at HCMUT. Bounded LLMs. Contract-based pipelines. Shipped systems.
             </p>

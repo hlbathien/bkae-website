@@ -282,6 +282,12 @@ Rules:
 
 ## 16. Visual Asset Contract
 
+### 16.0 Logo Asset
+
+- The official logo mark is rendered via `LogoMark.tsx` (an inline SVG traced from raster).
+- Base asset path: `public/logo.svg` and `public/logo.png`.
+
+
 ### 16.1 Project artifacts (required for each v1 project)
 
 Each Project MUST ship one of: `/cover-<slug>.jpg` (≥1600×1200, amber-on-ink authored), **or** a first-class SVG schematic rendered inline. Dot-grid placeholder = banned in shipped pages.
