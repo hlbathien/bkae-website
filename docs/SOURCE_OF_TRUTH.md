@@ -164,7 +164,7 @@ Required projects in v1: `lumen-journal`, `atlas-clinical`.
 
 ### `/` Landing — section order, top→bottom
 
-1. Hero (RevealText headline, keyword chips, scroll cue)
+1. Hero (RevealText headline, keyword chips, live band, scroll cue)
 2. Manifesto pull-quote
 3. Projects (one ScrollTrigger-pinned scene per project)
 4. Process (5-stage horizontal scroll-jack; vertical on mobile)

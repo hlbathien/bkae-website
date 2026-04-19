@@ -14,8 +14,8 @@ const HeroBlob = dynamic(() => import("@/components/motion/HeroBlob"), { ssr: fa
 const KEYWORDS =
   "VIBE CODING · DETERMINISTIC · BOUNDED · SHIP · MEASURE · TRACEABLE · REFUSABLE · ";
 
-function SignalClock() {
-  const [t, setT] = useState<string>("—:—:—");
+function LiveClock() {
+  const [t, setT] = useState<string>("ICT —:—:—");
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("en-GB", {
       hour: "2-digit",
@@ -24,12 +24,12 @@ function SignalClock() {
       timeZone: "Asia/Ho_Chi_Minh",
       hour12: false,
     });
-    const tick = () => setT(fmt.format(new Date()));
+    const tick = () => setT(`ICT ${fmt.format(new Date())}`);
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return <span suppressHydrationWarning>{t} ICT</span>;
+  return <span suppressHydrationWarning>{t}</span>;
 }
 
 export default function Hero() {
@@ -142,32 +142,9 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* Signal strip */}
-        <div className="mt-16 grid w-full max-w-3xl grid-cols-2 gap-x-8 gap-y-3 border-t border-[var(--color-ink3)] pt-6 text-[var(--fs-eyebrow-sm)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel)] md:grid-cols-4">
-          <div>
-            <div className="text-[var(--color-steel)]">Local</div>
-            <div className="text-[var(--color-ivory2)] font-[var(--font-mono)] normal-case tracking-normal">
-              <SignalClock />
-            </div>
-          </div>
-          <div>
-            <div className="text-[var(--color-steel)]">Coords</div>
-            <div className="text-[var(--color-ivory2)] font-[var(--font-mono)] normal-case tracking-normal">
-              10.7720° N · 106.6577° E
-            </div>
-          </div>
-          <div>
-            <div className="text-[var(--color-steel)]">Status</div>
-            <div className="text-[var(--color-amber)] font-[var(--font-mono)] normal-case tracking-normal">
-              shipping · v1
-            </div>
-          </div>
-          <div>
-            <div className="text-[var(--color-steel)]">Cohort</div>
-            <div className="text-[var(--color-ivory2)] font-[var(--font-mono)] normal-case tracking-normal">
-              founding · open
-            </div>
-          </div>
+        {/* Live build band */}
+        <div className="mt-10 font-[var(--font-mono)] text-[var(--fs-eyebrow-sm)] normal-case tracking-normal text-[var(--color-steel)]">
+          <LiveClock /> · v1.0.0-{process.env.NEXT_PUBLIC_BUILD_SHA || "dev"} · online · HCMUT
         </div>
 
         <div className="mt-14">
