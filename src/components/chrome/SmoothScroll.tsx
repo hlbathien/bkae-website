@@ -3,32 +3,63 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { ensureGsap } from "@/lib/gsap";
 
+declare global {
+  interface Window {
+    __lenis?: Lenis;
+  }
+}
+
+/**
+ * Lenis smooth scroll. Static import (no async race). Dedupe via window flag
+ * to survive React StrictMode double-mount in dev. Keep wheel smoothing enabled
+ * even when reduced motion is requested so Windows mice do not fall back to
+ * native line-step scrolling.
+ */
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lenis = new Lenis({
-      duration: 1.1,
-      lerp: 0.08,
-      smoothWheel: true,
-    });
+    // StrictMode dedupe — second mount finds live instance, noop.
+    if (window.__lenis) return;
 
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const { gsap, ScrollTrigger } = ensureGsap();
 
-    function raf(time: number) {
-      lenis.raf(time);
-    }
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(raf);
+    const lenis = new Lenis({
+      duration: reduce ? 0.65 : 1.15,
+      lerp: reduce ? 0.16 : 0.09,
+      smoothWheel: true,
+      wheelMultiplier: reduce ? 0.85 : 1,
+      touchMultiplier: reduce ? 1 : 1.5,
+      anchors: true,
+      stopInertiaOnNavigate: true,
+    });
+    window.__lenis = lenis;
+
+    const syncLenisWithGsap = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(syncLenisWithGsap);
     gsap.ticker.lagSmoothing(0);
 
-    document.body.classList.add("lenis");
+    lenis.on("scroll", ScrollTrigger.update);
+
+    const refresh = () => ScrollTrigger.refresh();
+    const onLoad = () => refresh();
+    const onResize = () => refresh();
+    window.addEventListener("load", onLoad);
+    window.addEventListener("resize", onResize);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(refresh).catch(() => {});
+    }
+    refresh();
 
     return () => {
-      gsap.ticker.remove(raf);
+      gsap.ticker.remove(syncLenisWithGsap);
+      window.removeEventListener("load", onLoad);
+      window.removeEventListener("resize", onResize);
       lenis.destroy();
-      document.body.classList.remove("lenis");
+      delete window.__lenis;
     };
   }, []);
 

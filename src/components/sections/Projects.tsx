@@ -1,55 +1,33 @@
 "use client";
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import Tag from "@/components/primitives/Tag";
 import CountUp from "@/components/motion/CountUp";
 import { projects, type Project } from "@/lib/cms";
-import { ensureGsap } from "@/lib/gsap";
+import { ProjectArtifact } from "@/components/sections/ProjectDiagrams";
 
 function ProjectScene({ p, idx }: { p: Project; idx: number }) {
-  const wrap = useRef<HTMLDivElement>(null);
-  const stack = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!wrap.current || !stack.current) return;
-    if (window.matchMedia("(max-width: 1024px)").matches) return;
-    const { gsap } = ensureGsap();
-    const layers = stack.current.querySelectorAll<HTMLElement>("[data-layer]");
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrap.current,
-          start: "top top",
-          end: "+=120%",
-          pin: true,
-          scrub: 1.2,
-        },
-      });
-      layers.forEach((l, i) => {
-        tl.to(l, { yPercent: -8 * (i + 1), xPercent: 4 * i, rotate: -3 + i * 2, ease: "none" }, 0);
-      });
-    }, wrap);
-
-    return () => ctx.revert();
-  }, []);
-
+  const alt = idx % 2 === 1;
   return (
     <div
-      ref={wrap}
-      className="relative grid grid-cols-1 items-center gap-10 py-32 lg:grid-cols-12 lg:gap-16"
+      className="relative grid grid-cols-1 items-start gap-10 border-t border-[var(--color-ink3)] py-[var(--space-section-sm)] lg:grid-cols-12 lg:gap-16"
     >
-      <div className="lg:col-span-5">
-        <p className="eyebrow mb-6">{p.eyebrow}</p>
-        <h3
-          className="font-display text-[var(--color-ivory)]"
-          style={{ fontSize: "clamp(32px, 4.5vw, 64px)" }}
-        >
+      <div className={`min-w-0 lg:col-span-5 ${alt ? "lg:order-2" : ""}`}>
+        <div className="flex items-baseline gap-4">
+          <span
+            className="font-display text-[var(--color-amber)]"
+            style={{ fontSize: "clamp(40px, 5vw, 72px)", lineHeight: 1, letterSpacing: "var(--tr-display-tight)" }}
+          >
+            {p.index}
+          </span>
+          <div className="h-px w-16 bg-[var(--color-amber)]" />
+          <p className="eyebrow">{p.eyebrow}</p>
+        </div>
+        <h3 className="mt-6 font-display h-display-m text-[var(--color-ivory)]">
           {p.title}
         </h3>
 
-        <dl className="mt-10 space-y-6 text-[var(--color-ivory2)]">
+        <dl className="mt-10 space-y-6 text-[var(--color-ivory2)] text-[var(--fs-body)] leading-[var(--lh-body)]">
           <div>
             <dt className="eyebrow mb-1">Problem</dt>
             <dd>{p.problem}</dd>
@@ -61,8 +39,8 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
           <div>
             <dt className="eyebrow mb-1">Outcome</dt>
             <dd
-              className="font-serif-italic text-[var(--color-amber)]"
-              style={{ fontSize: "20px" }}
+              className="font-serif-italic text-[var(--color-amber-hot)]"
+              style={{ fontSize: "clamp(20px, 2vw, 26px)", lineHeight: 1.3 }}
             >
               {p.outcome}
             </dd>
@@ -70,21 +48,21 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
         </dl>
 
         <div className="mt-8 flex flex-wrap gap-2">
-          {p.stack.map((s) => (
-            <Tag key={s}>{s}</Tag>
+          {p.stack.map((s, i) => (
+            <Tag key={s}>{i === 0 ? <span className="text-[var(--color-amber)]">●</span> : null} {s}</Tag>
           ))}
         </div>
 
-        <div className="mt-10 grid grid-cols-3 gap-6">
+        <div className="mt-10 grid grid-cols-3 gap-4 sm:gap-6">
           {p.stats.map((s) => (
-            <div key={s.label}>
+            <div key={s.label} className="min-w-0">
               <div
-                className="font-display text-[var(--color-amber)]"
-                style={{ fontSize: "clamp(28px, 3.6vw, 48px)" }}
+                className="font-display text-[var(--color-amber)] truncate"
+                style={{ fontSize: "clamp(28px, 3vw, 44px)", lineHeight: 1, letterSpacing: "var(--tr-display-tight)" }}
               >
                 <CountUp to={s.value} suffix={s.suffix ?? ""} />
               </div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-steel)]">
+              <div className="mt-2 eyebrow-sm text-[var(--color-steel)]">
                 {s.label}
               </div>
             </div>
@@ -94,46 +72,23 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
         <div className="mt-10">
           <Link
             href={`/projects/${p.slug}`}
-            className="bracket-link text-[12px] uppercase tracking-[0.22em] text-[var(--color-ivory)] hover:text-[var(--color-amber)]"
+            data-cursor="link"
+            className="bracket-link text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)]"
           >
             Read the build →
           </Link>
         </div>
       </div>
 
-      <div className="lg:col-span-7">
-        <div ref={stack} className="relative aspect-[4/3] w-full" style={{ perspective: "1400px" }}>
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              data-layer
-              className="absolute inset-0 border border-[var(--color-ink3)] bg-gradient-to-br from-[var(--color-ink2)] to-[var(--color-ink)] shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
-              style={{
-                transform: `translate3d(${i * 12}px, ${i * 14}px, 0) rotate(${-3 + i * 2}deg)`,
-                zIndex: 10 - i,
-              }}
-            >
-              <div className="flex h-9 items-center gap-1 border-b border-[var(--color-ink3)] px-3">
-                <span className="h-2 w-2 rounded-full bg-[var(--color-ink3)]" />
-                <span className="h-2 w-2 rounded-full bg-[var(--color-ink3)]" />
-                <span className="h-2 w-2 rounded-full bg-[var(--color-ink3)]" />
-                <span className="ml-3 text-[10px] uppercase tracking-[0.18em] text-[var(--color-steel)]">
-                  {p.slug}/layer-{i}
-                </span>
-              </div>
-              <div className="grid grid-cols-12 gap-1 p-4">
-                {Array.from({ length: 84 }).map((_, k) => (
-                  <span
-                    key={k}
-                    className="h-1.5 rounded-sm"
-                    style={{
-                      background: k % 13 === idx ? "var(--color-amber)" : "rgba(122,132,144,0.18)",
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+      <div className={`min-w-0 lg:col-span-7 ${alt ? "lg:order-1" : ""}`} data-cursor="view">
+        <div className="relative border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-4 md:p-8">
+          <div className="mb-3 flex items-center justify-between eyebrow-sm text-[var(--color-steel)]">
+            <span>
+              <span className="text-[var(--color-amber)]">●</span> diagram · {p.slug}
+            </span>
+            <span>live</span>
+          </div>
+          <ProjectArtifact slug={p.slug} />
         </div>
       </div>
     </div>
@@ -142,15 +97,12 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
 
 export default function Projects() {
   return (
-    <section id="projects" className="relative border-t border-[var(--color-ink3)]">
+    <section id="projects" data-section="projects" className="relative border-t border-[var(--color-ink3)]">
       <Frame>
-        <header className="flex items-end justify-between py-16">
+        <header className="flex items-end justify-between pt-[var(--space-section-sm)] pb-[var(--space-block)]">
           <div>
-            <p className="eyebrow mb-3">[ Evidence · 02 ]</p>
-            <h2
-              className="font-display text-[var(--color-ivory)]"
-              style={{ fontSize: "clamp(36px, 5vw, 80px)" }}
-            >
+            <p className="eyebrow mb-3">Evidence · 02</p>
+            <h2 className="font-display h-display-l text-[var(--color-ivory)]">
               Two systems.
               <br />
               <span className="font-serif-italic text-[var(--color-amber)]">Both shipped.</span>
@@ -158,7 +110,8 @@ export default function Projects() {
           </div>
           <Link
             href="/projects"
-            className="bracket-link hidden text-[12px] uppercase tracking-[0.22em] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
+            data-cursor="link"
+            className="bracket-link hidden text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
           >
             All projects →
           </Link>

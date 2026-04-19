@@ -1,22 +1,24 @@
 "use client";
-import { useEffect, useRef, createElement } from "react";
-import type { ElementType } from "react";
+import { useEffect, useRef } from "react";
 import { ensureGsap } from "@/lib/gsap";
 
 export default function RevealText({
   children,
-  as = "span",
   className = "",
   delay = 0,
   splitBy = "word",
 }: {
   children: string;
-  as?: ElementType;
+  /**
+   * Kept for prop API compatibility; component always renders a span.
+   * If a different tag is needed, wrap externally.
+   */
+  as?: "span";
   className?: string;
   delay?: number;
   splitBy?: "char" | "word";
 }) {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -41,23 +43,54 @@ export default function RevealText({
     };
   }, [delay, splitBy]);
 
-  const tokens = splitBy === "char" ? children.split("") : children.split(/(\s+)/);
+  const renderWordChars = (word: string, baseKey: number) =>
+    word.split("").map((c, i) => (
+      <span
+        key={`${baseKey}-${i}`}
+        data-r
+        style={{ display: "inline-block", willChange: "transform,opacity" }}
+      >
+        {c}
+      </span>
+    ));
 
-  return createElement(
-    as,
-    {
-      ref,
-      className,
-      style: { display: "inline-block", perspective: 800 },
-    },
-    tokens.map((t, i) =>
+  let content: React.ReactNode;
+  if (splitBy === "char") {
+    // Group chars by word so words never break mid-line.
+    const parts = children.split(/(\s+)/);
+    content = parts.map((t, i) =>
       t.match(/^\s+$/) ? (
         <span key={i}>{t}</span>
       ) : (
-        <span key={i} data-r style={{ display: "inline-block", willChange: "transform,opacity" }}>
+        <span key={i} style={{ display: "inline-block", whiteSpace: "nowrap" }}>
+          {renderWordChars(t, i)}
+        </span>
+      ),
+    );
+  } else {
+    const tokens = children.split(/(\s+)/);
+    content = tokens.map((t, i) =>
+      t.match(/^\s+$/) ? (
+        <span key={i}>{t}</span>
+      ) : (
+        <span
+          key={i}
+          data-r
+          style={{ display: "inline-block", willChange: "transform,opacity" }}
+        >
           {t}
         </span>
       ),
-    ),
+    );
+  }
+
+  return (
+    <span
+      ref={ref}
+      className={className}
+      style={{ display: "inline-block", perspective: 800 }}
+    >
+      {content}
+    </span>
   );
 }

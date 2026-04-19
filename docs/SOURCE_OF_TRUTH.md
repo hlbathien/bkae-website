@@ -77,7 +77,7 @@ No other routes in v1.
 
 ## 6. Tech Stack (locked)
 
-- Next.js **15.0.3** App Router, React **19 RC**
+- Next.js **16.2.4** App Router, React **19.2**
 - TypeScript strict
 - Tailwind **v4** beta + `@theme` tokens, PostCSS, autoprefixer
 - GSAP 3 + ScrollTrigger
@@ -122,6 +122,7 @@ Types are source of truth. Match exactly.
 ```ts
 type Project = {
   slug: string;
+  index: string;          // "01", "02" — display ordinal
   title: string;
   eyebrow: string;
   problem: string;
@@ -129,20 +130,29 @@ type Project = {
   outcome: string;
   stack: string[];
   stats: { label: string; value: number; suffix?: string }[];
-  links: { github?: string; demo?: string; paper?: string };
+  cover: string;          // public path to cover image
+  links: { github?: string; demo?: string };
 };
 
 type Post = {
   slug: string;
   title: string;
   excerpt: string;
+  cover: string;
   category: string;
   readingTime: string;
   publishedAt: string;
 };
 
-type Member = { name: string; role: string; year?: string };
-type Announcement = { id: string; text: string; href?: string };
+type Member = {
+  slug: string;
+  name: string;
+  role: string;
+  bio: string;
+  links: { github?: string; x?: string };
+};
+
+type Announcement = { text: string; href: string };
 ```
 
 Required projects in v1: `lumen-journal`, `atlas-clinical`.
@@ -220,7 +230,83 @@ A change is **DONE** only if all true:
 - [ ] If CMS data added: types unchanged or this doc updated
 - [ ] If new dir/dep added: this doc updated
 
-## 14. Out-of-scope guardrail
+## 15. Interaction System
+
+### 15.1 Cursor state machine
+
+Custom cursor is a single-author component. Every interactive element declares intent via `data-cursor`:
+
+| Value         | Visual                                                    | Use                               |
+| ------------- | --------------------------------------------------------- | --------------------------------- |
+| _(none)_      | 6px amber dot + 32px ivory ring (default)                 | Idle                              |
+| `link`        | Ring scales ×1.4, amber fill 18%, dot hides               | Nav, inline links                 |
+| `view`        | Ring scales ×2.4 w/ label "VIEW" in mono 10px             | Project covers, dataviz           |
+| `read`        | Ring morphs to vertical bar, label "READ →"               | Journal cards                     |
+| `drag`        | Ring scales ×1.8, label "DRAG"                            | Horizontal scroll regions         |
+| `magnet`      | Ring attracted to element center (quickTo)                | Primary CTAs                      |
+| `text`        | Ring collapses to 1px vertical caret                      | Hero headline hover               |
+
+Rules:
+- Cursor hidden on `(hover: none)` and `prefers-reduced-motion: reduce`.
+- No state may change cursor color away from amber (signal lane).
+- Label text: `font-mono 10px`, uppercase, letter-spacing `0.18em`.
+
+### 15.2 Scroll system
+
+- Lenis smooth scroll wired to GSAP ticker (existing).
+- Left-gutter vertical progress rail (desktop ≥ 1024px): 1px ivory line, amber dot marking current section, mono section label.
+- No CSS scroll-snap. Snap only via GSAP ScrollToPlugin-equivalent behavior (manual). Keep scroll linear; rail is indicator only.
+
+### 15.3 Page transitions
+
+- First visit: 900ms curtain intro — black panel wipes upward, reveals hero. Stored in `sessionStorage` so subsequent navigations skip.
+- Route change: 400ms curtain-fade overlay (amber 4% → ink), then new page RevealText.
+- Shared element morph is out-of-scope v1.
+
+### 15.4 Micro-interactions contract
+
+- Every `<Link>` outside nav: must declare `data-cursor` or use `draw-underline` / `bracket-link` / `cta-fill`.
+- Every primary CTA: `MagneticBtn` wrap + `data-cursor="magnet"`.
+- Every image/cover: `data-cursor="view"`.
+- Every horizontally-scrolling track: `data-cursor="drag"`.
+- Hover timings: 200–320ms, ease `--ease-out-expo`. Never longer on layout properties.
+
+### 15.5 Easter eggs
+
+- `g` toggles GridOverlay (exists).
+- Console greeting on load: `%cInference — Bounded LLMs. Contract-based pipelines.` (amber, mono, one call in layout).
+- `↑↑↓↓←→←→BA` enables amber-trace mode (persistent grid + HUD). Session-scoped.
+
+## 16. Visual Asset Contract
+
+### 16.1 Project artifacts (required for each v1 project)
+
+Each Project MUST ship one of: `/cover-<slug>.jpg` (≥1600×1200, amber-on-ink authored), **or** a first-class SVG schematic rendered inline. Dot-grid placeholder = banned in shipped pages.
+
+| Project         | Artifact                                                     |
+| --------------- | ------------------------------------------------------------ |
+| `lumen-journal` | Inline SVG: 5-node pipeline (Input→Tags→Writer→Memory→Output), animated edges, contract chips |
+| `atlas-clinical`| Inline SVG: PDF source → extraction contract → traceable claim graph, citation arcs |
+
+Animations: entrance on `ScrollTrigger start: top 75%`; guard w/ reduced-motion.
+
+### 16.2 Hero visual
+
+Hero carries: a cursor-tracked WebGL blob (amber radial, low-freq noise displacement), and one slow scrubbed marquee of KEYWORDS at 0.05 opacity. No stacked marquees. No static radial duplicate.
+
+### 16.3 Inversion moment
+
+Exactly one section on `/` inverts to `--color-ivory` bg + `--color-ink` fg (currently: Manifesto amplifier). This is the **only** light panel on the site. Do not replicate.
+
+## 17. Dependency delta
+
+Added to locked stack:
+
+- `ogl` (~6 KB gz) — WebGL micro-lib for hero distortion field. Lazy-loaded via `next/dynamic`, SSR off.
+
+Previously forbidden `three.js` remains forbidden. `ogl` is explicitly carved out.
+
+## 18. Out-of-scope guardrail
 
 Agent **must not**:
 

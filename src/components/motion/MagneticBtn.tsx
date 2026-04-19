@@ -7,25 +7,28 @@ export default function MagneticBtn({
   className = "",
   href,
   onClick,
+  strength = 0.25,
 }: {
   children: React.ReactNode;
   className?: string;
   href?: string;
   onClick?: () => void;
+  strength?: number;
 }) {
   const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const xTo = gsap.quickTo(el, "x", { duration: 0.4, ease: "power3.out" });
     const yTo = gsap.quickTo(el, "y", { duration: 0.4, ease: "power3.out" });
     const onMove = (e: MouseEvent) => {
       const r = el.getBoundingClientRect();
       const dx = e.clientX - (r.left + r.width / 2);
       const dy = e.clientY - (r.top + r.height / 2);
-      xTo(dx * 0.25);
-      yTo(dy * 0.25);
+      xTo(dx * strength);
+      yTo(dy * strength);
     };
     const onLeave = () => {
       xTo(0);
@@ -37,17 +40,17 @@ export default function MagneticBtn({
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
     };
-  }, []);
+  }, [strength]);
 
   if (href) {
     return (
-      <a ref={ref as never} href={href} className={className}>
+      <a ref={ref as never} href={href} data-cursor="magnet" className={className}>
         {children}
       </a>
     );
   }
   return (
-    <button ref={ref as never} onClick={onClick} className={className}>
+    <button ref={ref as never} onClick={onClick} data-cursor="magnet" className={className}>
       {children}
     </button>
   );

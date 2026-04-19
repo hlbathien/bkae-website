@@ -156,17 +156,96 @@ Reference: `docs/SOURCE_OF_TRUTH.md` (SoT). Conflicts → SoT wins.
 
 ---
 
+## Phase 8 — Cursor System v2
+
+Replace `chrome/Cursor.tsx`. Add `data-cursor` attribute API. States per SoT §15.1. Hidden on touch + reduced-motion. ScrollTrigger-free; `requestAnimationFrame` only.
+
+**Acceptance:** all 6 states reachable from `/`; no jank under devtools 4× CPU throttle; tsc/lint/build clean.
+
+## Phase 9 — Hero v2 (kinetic + WebGL)
+
+`HeroBlob.tsx` (lazy, ssr:false) using `ogl`. Single scrubbed background marquee at 0.05 opacity. Primary CTA pair: "Apply →" magnetic, "View work" ghost. Live signal strip: ICT clock, lat/lon HCMUT, build-hash placeholder. Scrubbed kinetic title (letter-spacing widens on scroll until pin release).
+
+**Acceptance:** LCP ≤ 2.6s mobile slow 4G; blob disabled under reduced-motion; works at 320px viewport.
+
+## Phase 10 — Scroll Progress Rail
+
+`chrome/ScrollRail.tsx` fixed in left gutter ≥ 1024px. Sections registered via `data-section`. Active dot scales + label fades in.
+
+**Acceptance:** dot tracks scroll position w/in 1 frame; hidden on mobile; keyboard non-essential.
+
+## Phase 11 — Project SVG Artifacts
+
+Replace card-stack-of-dots in `Projects.tsx` w/ project-specific inline SVG (Lumen pipeline, Atlas trace graph). Animated edges via stroke-dashoffset on ScrollTrigger.
+
+**Acceptance:** zero `<div data-layer>` placeholders remain; both diagrams legible at 768px.
+
+## Phase 12 — Inverted Manifesto Amplifier
+
+Convert Manifesto to ivory bg + ink fg. Oversized Instrument Serif italic. Single section only (SoT §16.3).
+
+**Acceptance:** contrast AAA ink-on-ivory; eyebrow + amber accent retained; surrounding sections unchanged.
+
+## Phase 13 — CTA Bands Reordered + Hover Covers
+
+Order: Apply (01) / Projects (02) / Journal (03). Each band: cover image preview slides in from cursor on hover (CSS clip-path mask). Magnetic on apply.
+
+**Acceptance:** Apply is first; cover mask never blocks text; reduced-motion fallback.
+
+## Phase 14 — Footer Kinetic Wordmark
+
+`INFERENCE` wordmark scrub: opacity, letter-spacing, scale on enter. Live build SHA placeholder mono.
+
+**Acceptance:** no CLS; perf budget intact.
+
+## Phase 15 — Page Transition + Intro
+
+`chrome/PageTransition.tsx`. First-load curtain (sessionStorage gate). Route-change overlay 400ms. Listen to `next/navigation` router events.
+
+**Acceptance:** no FOUC; back/forward works; reduced-motion = instant.
+
+## Phase 16 — Micro-interactions Audit
+
+Sweep every interactive: cursor data-attr, hover spec compliant, focus-visible amber. MagneticBtn on every primary CTA across `/projects`, `/journal`, `/join`.
+
+**Acceptance:** zero interactive el missing data-cursor or focus-visible.
+
+## Phase 17 — Motion QA + Perf Reconcile
+
+Re-run Lighthouse all routes. Re-validate Phase 5 budgets w/ ogl included. Trim if breach. Capture before/after JS gz delta in report.
+
+**Acceptance:** landing ≤ 220 KB gz (relax to 240 if WebGL net-positive on visual review); perf ≥ 88 mobile.
+
+## Phase 18 — Award Submission Package
+
+Capture 5 screenshots, 1 ≤ 60s screen-record (Playwright video), accessibility statement, color-contrast report. Output `docs/reports/award-package/`.
+
+**Acceptance:** package complete; URLs ready for Awwwards/CSSDA submit.
+
+---
+
 ## Phase index
 
-| #   | Name     | Blocks |
-| --- | -------- | ------ |
-| 0   | Baseline | 1      |
-| 1   | Lint     | 2      |
-| 2   | Form     | 3      |
-| 3   | SEO      | 4      |
-| 4   | a11y     | 5      |
-| 5   | Perf     | 6      |
-| 6   | Content  | 7      |
-| 7   | Final    | —      |
+| #   | Name                  | Blocks |
+| --- | --------------------- | ------ |
+| 0   | Baseline              | 1      |
+| 1   | Lint                  | 2      |
+| 2   | Form                  | 3      |
+| 3   | SEO                   | 4      |
+| 4   | a11y                  | 5      |
+| 5   | Perf                  | 6      |
+| 6   | Content               | 7      |
+| 7   | Final (build quality) | 8      |
+| 8   | Cursor v2             | 9      |
+| 9   | Hero v2 + WebGL       | 10     |
+| 10  | Scroll rail           | 11     |
+| 11  | Project SVGs          | 12     |
+| 12  | Inversion             | 13     |
+| 13  | CTA bands             | 14     |
+| 14  | Footer kinetic        | 15     |
+| 15  | Page transition       | 16     |
+| 16  | Micro-int audit       | 17     |
+| 17  | Motion QA + perf      | 18     |
+| 18  | Award package         | —      |
 
 Agent must commit at end of each phase. One commit per phase. Message: `phase(N): <slug> — <one-line summary>`.

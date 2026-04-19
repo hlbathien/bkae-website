@@ -4,19 +4,23 @@ import { stats } from "@/lib/cms";
 
 export default function Stats() {
   return (
-    <section className="border-t border-[var(--color-ink3)] py-32">
+    <section data-section="stats" className="border-t border-[var(--color-ink3)] section-pad">
       <Frame>
-        <p className="eyebrow mb-10">[ Authority · 04 ]</p>
-        <div className="grid grid-cols-2 gap-12 md:grid-cols-4">
+        <p className="eyebrow mb-10">Authority · 04</p>
+        <div className="grid max-w-[1280px] grid-cols-2 gap-x-10 gap-y-14 md:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label}>
               <div
                 className="font-display text-[var(--color-amber)]"
-                style={{ fontSize: "clamp(48px, 7vw, 120px)", lineHeight: 1 }}
+                style={{
+                  fontSize: "var(--fs-stat-xl)",
+                  lineHeight: 1,
+                  letterSpacing: "var(--tr-display-tight)",
+                }}
               >
                 <CountUp to={s.value} suffix={s.suffix} />
               </div>
-              <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-[var(--color-steel-light)]">
+              <div className="mt-3 eyebrow-sm text-[var(--color-steel-light)]">
                 {s.label}
               </div>
             </div>

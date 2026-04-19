@@ -13,7 +13,7 @@ export default function MarqueeBar() {
   const a = announcements[i];
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-50 h-9 border-b border-[var(--color-ink3)] bg-[var(--color-ink2)] text-[11px] uppercase tracking-[0.18em] text-[var(--color-ivory2)]">
+    <div className="fixed left-0 right-0 top-0 z-50 h-9 border-b border-[var(--color-ink3)] bg-[var(--color-ink2)] text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-ivory2)]">
       <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)]">
         <span className="text-[var(--color-steel-light)]">
           <span className="text-[var(--color-amber)]">●</span> {a.text}

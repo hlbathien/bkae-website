@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { syne, instrumentSerif, dmMono } from "@/lib/fonts";
 import Header from "@/components/chrome/Header";
 import Footer from "@/components/chrome/Footer";
 import MarqueeBar from "@/components/chrome/MarqueeBar";
 import GridOverlay from "@/components/chrome/GridOverlay";
 import Cursor from "@/components/chrome/Cursor";
 import SmoothScroll from "@/components/chrome/SmoothScroll";
+import ScrollRail from "@/components/chrome/ScrollRail";
+import PageTransition from "@/components/chrome/PageTransition";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inference.club"),
@@ -31,16 +34,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="bg-[var(--color-ink)] text-[var(--color-ivory)]">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="no-cursor antialiased">
+    <html
+      lang="en"
+      className={`${syne.variable} ${instrumentSerif.variable} ${dmMono.variable} bg-[var(--color-ink)] text-[var(--color-ivory)]`}
+    >
+      <body className="antialiased">
         <noscript>
           <div
             style={{
@@ -57,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </noscript>
         <SmoothScroll>
+          <PageTransition />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-[var(--color-amber)] focus:text-[var(--color-ink)] focus:px-3 focus:py-2"
@@ -66,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MarqueeBar />
           <Header />
           <GridOverlay />
+          <ScrollRail />
           <Cursor />
           <main id="main">{children}</main>
           <Footer />

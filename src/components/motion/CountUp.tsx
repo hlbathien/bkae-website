@@ -16,6 +16,11 @@ export default function CountUp({
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const fmt = new Intl.NumberFormat("en-US");
+      if (ref.current) ref.current.textContent = fmt.format(to) + suffix;
+      return;
+    }
     const { gsap } = ensureGsap();
     const obj = { v: 0 };
     const fmt = new Intl.NumberFormat("en-US");

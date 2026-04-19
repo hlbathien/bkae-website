@@ -12,9 +12,9 @@
   --color-steel: #7a8490;
   --color-steel-light: #b2bbc4;
 
-  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, SFMono-Regular, monospace;
 
   --ease-precise: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -22,7 +22,42 @@
 
 :root {
   color-scheme: dark;
+
+  /* Horizontal gutter (unchanged) */
   --gutter: clamp(20px, 5vw, 96px);
+
+  /* Vertical rhythm — one token, used by every section */
+  --space-section: clamp(96px, 12vw, 200px);
+  --space-section-sm: clamp(64px, 8vw, 128px);
+  --space-block: clamp(32px, 4vw, 64px);
+
+  /* Type scale — modular, ratio ~1.333. All display heads draw from here. */
+  --fs-display-xxl: clamp(64px, 11vw, 180px); /* hero */
+  --fs-display-xl: clamp(48px, 8vw, 128px);   /* manifesto quote, footer wordmark sits separate */
+  --fs-display-l: clamp(40px, 6vw, 96px);     /* section h2 hero ("Two systems") */
+  --fs-display-m: clamp(32px, 4.5vw, 64px);   /* sub-hero (project scene title) */
+  --fs-display-s: clamp(24px, 2.6vw, 36px);   /* card heads */
+
+  --fs-stat-xl: clamp(56px, 7.5vw, 112px);    /* Stats row */
+  --fs-stat-m: clamp(32px, 3.6vw, 48px);      /* inline scene stats */
+
+  --fs-body: 15px;
+  --fs-body-lg: 17px;
+  --fs-meta: 11px;
+  --fs-eyebrow: 11px;
+  --fs-eyebrow-sm: 10px;
+
+  /* Line-heights — snapped to 4px grid conceptually */
+  --lh-display-tight: 0.92;
+  --lh-display: 1.02;
+  --lh-body: 1.6;
+  --lh-mono: 1.55;
+
+  /* Tracking — 4 tokens only */
+  --tr-display-tight: -0.035em;
+  --tr-display-loose: -0.015em;
+  --tr-eyebrow: 0.2em;
+  --tr-wide: 0.22em;
 }
 
 * {
@@ -35,23 +70,31 @@ body {
   background: var(--color-ink);
   color: var(--color-ivory);
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: var(--fs-body);
+  line-height: var(--lh-mono);
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
+  font-synthesis: none; /* prevent synthetic bold/italic when requested weight is missing */
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
 }
 
-body.lenis {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
-.lenis.lenis-smooth {
+html.lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
+html.lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
+}
+
+html.lenis.lenis-stopped {
+  overflow: clip;
 }
 
 ::selection {
@@ -73,25 +116,55 @@ button {
   padding: 0;
 }
 
+/* Display family — shared optical settings */
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.03em;
-  line-height: 0.95;
+  letter-spacing: var(--tr-display-tight);
+  line-height: var(--lh-display-tight);
   font-weight: 800;
+  text-wrap: balance;
 }
 
 .font-serif-italic {
   font-family: var(--font-serif);
   font-style: italic;
-  letter-spacing: -0.01em;
+  font-weight: 400; /* Instrument Serif ships only 400 — prevent synthetic bold when nested in .font-display (weight 800) */
+  font-synthesis: none; /* block browser fake-bold/fake-italic fallback */
+  letter-spacing: var(--tr-display-loose) !important; /* override ancestor letter-spacing from .font-display scrubs */
+  text-wrap: balance;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "dlig" 1;
 }
 
+/* When Instrument Serif italic sits inside a display heading, it reads smaller optically
+   than Syne 800 at the same font-size. Bump em + lock tracking. */
+.font-display .font-serif-italic,
+h1 .font-serif-italic,
+h2 .font-serif-italic,
+h3 .font-serif-italic {
+  font-size: 1.12em;
+  letter-spacing: -0.01em !important;
+  line-height: 0.9;
+  display: inline-block;
+  vertical-align: baseline;
+  margin-right: 0.02em;
+}
+
+/* Eyebrow — single canonical treatment */
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--tr-eyebrow);
   text-transform: uppercase;
   color: var(--color-amber);
+  line-height: 1.4;
+}
+
+.eyebrow-sm {
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow-sm);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  line-height: 1.4;
 }
 
 .bracket-link::before {
@@ -114,7 +187,7 @@ button {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 320ms var(--ease-out-expo);
+  transition: transform 200ms var(--ease-out-expo);
 }
 .draw-underline:hover::after {
   transform: scaleX(1);
@@ -131,7 +204,7 @@ button {
   inset: 0;
   background: var(--color-amber);
   transform: translateX(-101%);
-  transition: transform 600ms var(--ease-out-expo);
+  transition: transform 180ms var(--ease-out-expo);
   z-index: -1;
 }
 .cta-fill:hover::before {
@@ -140,6 +213,23 @@ button {
 .cta-fill:hover {
   color: var(--color-ink);
 }
+
+/* Section rhythm helpers — consumed by section components */
+.section-pad {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+.section-pad-sm {
+  padding-top: var(--space-section-sm);
+  padding-bottom: var(--space-section-sm);
+}
+
+/* Editorial heading tokens */
+.h-display-xxl { font-size: var(--fs-display-xxl); }
+.h-display-xl  { font-size: var(--fs-display-xl); }
+.h-display-l   { font-size: var(--fs-display-l); }
+.h-display-m   { font-size: var(--fs-display-m); }
+.h-display-s   { font-size: var(--fs-display-s); }
 
 @media (prefers-reduced-motion: reduce) {
   *,

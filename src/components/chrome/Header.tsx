@@ -46,7 +46,7 @@ export default function Header() {
               <Link
                 key={n.href}
                 href={n.href}
-                className="draw-underline text-[12px] uppercase tracking-[0.18em] text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]"
+                className="draw-underline text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]"
               >
                 {n.label}
               </Link>
@@ -58,13 +58,13 @@ export default function Header() {
               href="https://github.com/inference-club"
               target="_blank"
               rel="noreferrer"
-              className="hidden md:inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[var(--color-steel-light)] hover:text-[var(--color-amber)]"
+              className="hidden md:inline-flex items-center gap-2 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel-light)] hover:text-[var(--color-amber)]"
             >
               <Github size={14} /> Github
             </a>
             <Link
               href="/join"
-              className="cta-fill border border-[var(--color-amber)] px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--color-amber)]"
+              className="cta-fill border border-[var(--color-amber)] px-4 py-2 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-amber)]"
             >
               Join
             </Link>
