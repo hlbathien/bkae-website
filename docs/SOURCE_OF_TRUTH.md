@@ -241,13 +241,20 @@ Custom cursor is a single-author component. Every interactive element declares i
 
 | Value         | Visual                                                    | Use                               |
 | ------------- | --------------------------------------------------------- | --------------------------------- |
-| _(none)_      | 6px amber dot + 32px ivory ring (default)                 | Idle                              |
-| `link`        | Ring scales ×1.4, amber fill 18%, dot hides               | Nav, inline links                 |
-| `view`        | Ring scales ×2.4 w/ label "VIEW" in mono 10px             | Project covers, dataviz           |
-| `read`        | Ring morphs to vertical bar, label "READ →"               | Journal cards                     |
-| `drag`        | Ring scales ×1.8, label "DRAG"                            | Horizontal scroll regions         |
-| `magnet`      | Ring attracted to element center (quickTo)                | Primary CTAs                      |
-| `text`        | Ring collapses to 1px vertical caret                      | Hero headline hover               |
+| _(none)_      | 32px amber ring + 6px amber dot                           | Idle                              |
+| `link`        | 44px ring, amber fill 12%, dot hides                      | Nav, inline links                 |
+| `view`        | 80px ring, ink fill 55% w/ label "VIEW"                   | Project covers, dataviz           |
+| `read`        | 48x64 rect, amber border, label "READ →"                  | Journal cards                     |
+| `drag`        | 64px ring, amber fill 8%, label "DRAG"                    | Horizontal scroll regions         |
+| `magnet`      | 56px ring, amber-hot border, snaps to target center       | Primary CTAs                      |
+| `text`        | 2x24 rect, filled amber                                   | Typography interaction            |
+| `disabled`    | 40px ring, steel border, label "×"                        | Disabled buttons                  |
+| `copy`        | 64px ring, amber fill 20%, label "COPY"                   | Snippets                          |
+| `next`        | 56px ring, label "→"                                      | Carousel next                     |
+| `prev`        | 56px ring, label "←"                                      | Carousel prev                     |
+| `external`    | 56px ring, label "↗"                                      | External links                    |
+| `play`        | 64px ring, label "▶"                                      | Video/Audio triggers              |
+| `pinned`      | 20px ring, filled amber                                   | Selection markers                 |
 
 Rules:
 - Cursor hidden on `(hover: none)` and `prefers-reduced-motion: reduce`.
