@@ -24,7 +24,7 @@ export default function GridOverlay() {
       window.__inferenceGreeted = true;
       try {
         console.log(
-          "%cInference — Bounded LLMs. Contract-based pipelines. Shipped systems.",
+          "%cAgentic Engineering — Bounded LLMs. Contract-based pipelines. Shipped systems.",
           "color:#d4870a;font-family:monospace;font-size:13px;letter-spacing:0.08em;",
         );
         console.log(

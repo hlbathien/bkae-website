@@ -13,21 +13,21 @@ import PageTransition from "@/components/chrome/PageTransition";
 export const metadata: Metadata = {
   metadataBase: new URL("https://inference.club"),
   title: {
-    default: "Inference — Agentic Engineering at HCMUT",
-    template: "%s · Inference",
+    default: "Agentic Engineering — HCMUT",
+    template: "%s · Agentic Engineering",
   },
   description:
-    "Inference is the Agentic Engineering club at HCMUT. We ship bounded, contract-based AI systems and teach the discipline behind them.",
+    "Agentic Engineering is the HCMUT student club institutionalizing bounded, contract-based AI engineering. Founded by two first-year students. Currently shipping.",
   openGraph: {
-    title: "Inference — Agentic Engineering at HCMUT",
-    description: "Bounded LLMs. Contract-based pipelines. Shipped systems. Founded at HCMUT.",
+    title: "Agentic Engineering — HCMUT",
+    description: "Agentic Engineering is the HCMUT student club institutionalizing bounded, contract-based AI engineering. Founded by two first-year students. Currently shipping.",
     type: "website",
-    images: [{ url: "/og.svg", width: 1200, height: 630, alt: "Inference — Agentic Engineering" }],
+    images: [{ url: "/og.svg", width: 1200, height: 630, alt: "Agentic Engineering — HCMUT" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Inference — Agentic Engineering at HCMUT",
-    description: "Bounded LLMs. Contract-based pipelines. Shipped systems. Founded at HCMUT.",
+    title: "Agentic Engineering — HCMUT",
+    description: "Agentic Engineering is the HCMUT student club institutionalizing bounded, contract-based AI engineering. Founded by two first-year students. Currently shipping.",
     images: ["/og.svg"],
   },
 };

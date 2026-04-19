@@ -58,7 +58,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-[var(--gutter)] pt-[var(--space-section-sm)] pb-10">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <p className="eyebrow mb-3">Inference</p>
+            <p className="eyebrow mb-3">Agentic Engineering</p>
             <p className="text-[var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-steel-light)] max-w-xs">
               Agentic Engineering at HCMUT. Bounded LLMs. Contract-based pipelines. Shipped systems.
             </p>
@@ -128,15 +128,15 @@ export default function Footer() {
 
       <div
         aria-hidden
-        className="pointer-events-none overflow-hidden px-[var(--gutter)]"
-        style={{ maxHeight: "20vw" }}
+        className="pointer-events-none overflow-hidden px-[var(--gutter)] flex flex-col items-center justify-center"
       >
         <h2
           ref={word}
-          className="font-display leading-[0.85] text-center"
-          style={{ fontSize: "clamp(80px, 22vw, 360px)", marginBottom: "-0.3em", letterSpacing: "var(--tr-display-tight)" }}
+          className="font-display leading-[0.85] text-center flex flex-col"
+          style={{ fontSize: "clamp(50px, 14vw, 220px)", marginBottom: "-0.3em", letterSpacing: "var(--tr-display-tight)" }}
         >
-          INFERENCE
+          <span>AGENTIC</span>
+          <span>ENGINEERING</span>
         </h2>
       </div>
     </footer>

@@ -36,9 +36,10 @@ export default function Header() {
         <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)]">
           <Link
             href="/"
-            className="font-display text-[18px] tracking-tight text-[var(--color-ivory)]"
+            className="font-display flex items-center gap-2 text-[18px] tracking-tight text-[var(--color-ivory)]"
           >
-            inference<span className="text-[var(--color-amber)]">.</span>
+            {/* LogoMark slot */}
+            <span>agentic engineering<span className="text-[var(--color-amber)]">.</span></span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">

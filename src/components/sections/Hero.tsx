@@ -86,7 +86,7 @@ export default function Hero() {
       <Frame className="relative z-10">
         <div className="mb-6 flex items-center gap-3">
           <span className="h-[6px] w-[6px] animate-pulse rounded-full bg-[var(--color-amber)]" />
-          <p className="eyebrow">Inference · HCMUT · Founded 2026</p>
+          <p className="eyebrow">Agentic Engineering · HCMUT · Founded 2026</p>
         </div>
 
         <h1

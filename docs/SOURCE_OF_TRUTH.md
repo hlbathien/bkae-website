@@ -6,13 +6,16 @@
 
 ## 1. Identity
 
-- **Org name:** Inference (project alias `bkae-website`)
-- **Affiliation:** HCMUT (Ho Chi Minh City University of Technology)
-- **Discipline:** Agentic Engineering — bounded LLMs, deterministic edges, surfaced uncertainty, ship-to-learn
-- **Founders:** 2 first-year students
-- **Proof:** 2nd place, Best Use of Qwen — Vietnam GenAI Hackathon (largest in VN)
-- **Locale:** Vietnam, timezone `Asia/Ho_Chi_Minh`
-- **Language:** English-only (v1)
+| Field | Value |
+|---|---|
+| Org name | Agentic Engineering |
+| Internal alias | `bkae-website` (do not rename) |
+| Affiliation | HCMUT (Ho Chi Minh City University of Technology) |
+| Discipline | Bounded LLMs · Contract-based pipelines · Shipped systems |
+| Founders | 2 first-year HCMUT students |
+| Proof | 2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025 |
+| Locale | Asia/Ho_Chi_Minh, English-only v1 |
+| Wordmark lockup | `[logo-mark amber 14px] agentic engineering.` (lowercase, period in amber) |
 
 ## 2. Goals (in priority order)
 

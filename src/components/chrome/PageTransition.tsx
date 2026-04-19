@@ -59,7 +59,7 @@ export default function PageTransition() {
               className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.28em] text-[var(--color-amber)]"
               style={{ animation: "introFade 600ms ease 120ms both" }}
             >
-              [ inference · v1 · 2026 ]
+              [ agentic engineering · v1 · 2026 ]
             </div>
             <div
               className="font-display text-[var(--color-ivory)]"
@@ -70,7 +70,7 @@ export default function PageTransition() {
                 animation: "introFade 700ms ease 240ms both",
               }}
             >
-              INFERENCE<span className="text-[var(--color-amber)]">.</span>
+              AGENTIC ENGINEERING<span className="text-[var(--color-amber)]">.</span>
             </div>
             <div
               className="relative h-[1px] w-48 overflow-hidden bg-[var(--color-ink3)]"
