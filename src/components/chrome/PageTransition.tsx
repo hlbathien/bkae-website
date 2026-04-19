@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import LogoMark from "@/components/primitives/LogoMark";
 import { ensureGsap } from "@/lib/gsap";
+import { initIdlePrefetch } from "@/lib/prefetch";
 
 function getVisitCount(): number {
   if (typeof window === "undefined") return 0;
@@ -19,6 +20,7 @@ export default function PageTransition() {
   const [mode, setMode] = useState<"full" | "mini" | "none">("none");
   const [routeOverlay, setRouteOverlay] = useState<boolean>(false);
   const pathname = usePathname();
+  const router = useRouter();
   const firstRun = useRef(true);
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -133,17 +135,36 @@ export default function PageTransition() {
   }, [mode]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
+      }
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
       return;
     }
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRouteOverlay(true);
+      const t = setTimeout(() => setRouteOverlay(false), 60);
+      return () => clearTimeout(t);
+    }
+    
     setRouteOverlay(true);
-    const t = setTimeout(() => setRouteOverlay(false), 400);
+    const t = setTimeout(() => setRouteOverlay(false), 900);
     return () => clearTimeout(t);
   }, [pathname]);
+
+  useEffect(() => {
+    return initIdlePrefetch(router);
+  }, [pathname, router]);
 
   const loadingText = "loading discipline...".split("");
   const wordmark1 = "AGENTIC".split("");
@@ -224,15 +245,42 @@ export default function PageTransition() {
       {routeOverlay && (
         <div
           aria-hidden
-          className="fixed inset-0 z-[80] bg-[var(--color-ink)]"
-          style={{ animation: "routeFade 400ms ease forwards" }}
-        />
+          className="fixed inset-0 z-[80] pointer-events-none"
+        >
+          {/* Reduced-motion fallback is handled via media query to just fade block */}
+          <div className="absolute inset-0 wipe-band bg-[var(--color-amber)] wipe-b1" />
+          <div className="absolute inset-0 wipe-band bg-[var(--color-ink)] wipe-b2" />
+          <div className="absolute inset-0 wipe-band bg-[var(--color-amber)] wipe-b3" />
+        </div>
       )}
       <style>{`
+        .wipe-band {
+          clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+        }
+        
+        .wipe-b1 { animation: wipeEnter 500ms forwards, wipeExit 400ms 500ms forwards; }
+        .wipe-b2 { animation: wipeEnter 500ms 80ms forwards, wipeExit 400ms 580ms forwards; }
+        .wipe-b3 { animation: wipeEnter 500ms 160ms forwards, wipeExit 400ms 660ms forwards; }
+
+        @keyframes wipeEnter {
+          0% { clip-path: polygon(0 100%, 0 100%, -50% 100%, -50% 100%); }
+          100% { clip-path: polygon(0 -100%, 200% -100%, 200% 100%, 0 100%); }
+        }
+        
+        @keyframes wipeExit {
+          0% { clip-path: polygon(0 -100%, 200% -100%, 200% 100%, 0 100%); }
+          100% { clip-path: polygon(100% 0, 100% 0, 250% 0, 250% 0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .wipe-b1 { animation: routeFade 60ms forwards; }
+          .wipe-b2, .wipe-b3 { display: none; }
+        }
+
         @keyframes routeFade {
-          0% { opacity: 0; }
-          40% { opacity: 1; }
-          100% { opacity: 0; }
+          0% { opacity: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+          40% { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+          100% { opacity: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
         }
       `}</style>
     </>
