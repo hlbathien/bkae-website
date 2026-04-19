@@ -48,9 +48,13 @@ export default function Hero() {
       // scrub kinetic title — tiny tracking shift, stays in display-tight range so resting pose preserved
       gsap.fromTo(
         titleEl,
-        { letterSpacing: "-0.035em" },
+        {
+          letterSpacing: "-0.035em",
+          textShadow: "0px 0px 0px rgba(212,135,10,0), 0px 0px 0px rgba(212,135,10,0)",
+        },
         {
           letterSpacing: "-0.025em",
+          textShadow: "0px 6px 16px rgba(212,135,10,0.5), 0px 18px 48px rgba(212,135,10,0.2)",
           ease: "none",
           scrollTrigger: {
             trigger: rootEl,
@@ -61,7 +65,60 @@ export default function Hero() {
         },
       );
     }, rootEl);
-    return () => ctx.revert();
+
+    // Dynamic char displacement
+    const chars = titleEl.querySelectorAll<HTMLElement>("[data-r]");
+    const positions = Array.from(chars).map(c => {
+      const r = c.getBoundingClientRect();
+      return { cx: r.left + r.width/2, cy: r.top + r.height/2 };
+    });
+    
+    let mx = -1000, my = -1000;
+    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    
+    // Recalculate on scroll/resize
+    const refreshPos = () => {
+      Array.from(chars).forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        positions[i] = { cx: r.left + r.width/2, cy: r.top + r.height/2 };
+      });
+    };
+    window.addEventListener("scroll", refreshPos, { passive: true });
+    window.addEventListener("resize", refreshPos, { passive: true });
+
+    gsap.ticker.add(() => {
+      chars.forEach((c, i) => {
+        const pos = positions[i];
+        const dx = mx - pos.cx;
+        const dy = my - pos.cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        let targetY = 0;
+        if (dist < 240) {
+          const factor = 1 - (dist / 240);
+          targetY = -4 * factor; // 4px Y displacement
+        }
+        
+        // Manual lerp on GSAP set is cleaner than full tween
+        const currentY = parseFloat(c.style.getPropertyValue("--dy") || "0");
+        const nextY = currentY + (targetY - currentY) * 0.15;
+        c.style.setProperty("--dy", nextY.toFixed(2));
+        
+        // Assume original RevealText tween handles transform; we inject via a wrapper or override.
+        // Actually, RevealText uses 'translate(x, y)'. Since gsap writes inline, we can't easily stack.
+        // Better: use relative transform or just force gsap.set.
+        // wait, RevealText finishes its tween to yPercent: 0, then we can take over.
+        gsap.set(c, { y: nextY });
+      });
+    });
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("scroll", refreshPos);
+      window.removeEventListener("resize", refreshPos);
+    };
   }, []);
 
   return (
@@ -101,19 +158,19 @@ export default function Hero() {
             overflowWrap: "break-word",
           }}
         >
-          <RevealText splitBy="word">AGENTIC</RevealText>{" "}
+          <RevealText splitBy="char">AGENTIC</RevealText>{" "}
           <RevealText
             as="span"
-            splitBy="word"
+            splitBy="char"
             className="font-serif-italic text-[var(--color-amber)] inline-block align-baseline"
             delay={0.15}
           >
             engineering
           </RevealText>{" "}
-          <RevealText splitBy="word" delay={0.25}>
+          <RevealText splitBy="char" delay={0.25}>
             FOR THE
           </RevealText>{" "}
-          <RevealText splitBy="word" delay={0.35}>
+          <RevealText splitBy="char" delay={0.35}>
             INEVITABLE.
           </RevealText>
         </h1>

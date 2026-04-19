@@ -1,8 +1,78 @@
 "use client";
+import { useRef, useLayoutEffect } from "react";
 import Frame from "@/components/primitives/Frame";
 import RevealText from "@/components/motion/RevealText";
+import { ensureGsap } from "@/lib/gsap";
 
 export default function Manifesto() {
+  const textRef = useRef<HTMLHeadingElement>(null);
+
+  useLayoutEffect(() => {
+    if (typeof window === "undefined" || !textRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    
+    const { gsap } = ensureGsap();
+    
+    // GSAP runs after DOM repaints and fonts load, but just in case, wait a tick
+    const t = setTimeout(() => {
+      const words = Array.from(textRef.current!.querySelectorAll("[data-r]")) as HTMLElement[];
+      if (words.length === 0) return;
+      
+      let currentLineY = words[0].offsetTop;
+      let currentLine: HTMLElement[] = [];
+      const lines: HTMLElement[][] = [];
+      
+      words.forEach(w => {
+        if (Math.abs(w.offsetTop - currentLineY) > 12) {
+          lines.push(currentLine);
+          currentLine = [w];
+          currentLineY = w.offsetTop;
+        } else {
+          currentLine.push(w);
+        }
+      });
+      if (currentLine.length) lines.push(currentLine);
+
+      const sweeps: HTMLDivElement[] = [];
+      textRef.current!.style.position = "relative";
+      
+      lines.forEach(line => {
+        if (line.length === 0) return;
+        const first = line[0];
+        const last = line[line.length - 1];
+        
+        const sweep = document.createElement("div");
+        sweep.className = "absolute h-[2px] bg-[var(--color-amber)]";
+        
+        const y = first.offsetTop + first.offsetHeight + 2;
+        const x = first.offsetLeft;
+        const width = last.offsetLeft + last.offsetWidth - x;
+        
+        sweep.style.top = `${y}px`;
+        sweep.style.left = `${x}px`;
+        sweep.style.width = `${width}px`;
+        sweep.style.transformOrigin = "left center";
+        sweep.style.transform = "scaleX(0)";
+        
+        textRef.current!.appendChild(sweep);
+        sweeps.push(sweep);
+      });
+      
+      gsap.to(sweeps, {
+        scaleX: 1,
+        duration: 0.85,
+        ease: "power3.out",
+        stagger: 0.18,
+        scrollTrigger: {
+          trigger: textRef.current,
+          start: "top 75%",
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <section
       id="manifesto"
@@ -42,6 +112,7 @@ export default function Manifesto() {
         </div>
 
         <h2
+          ref={textRef}
           className="mt-10 max-w-[22ch] text-[var(--color-ink)] font-serif-italic"
           style={{
             fontSize: "var(--fs-display-xl)",

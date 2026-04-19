@@ -27,12 +27,52 @@ function Clock() {
 export default function Footer() {
   const word = useRef<HTMLHeadingElement>(null);
 
+  const word1 = "AGENTIC".split("");
+  const word2 = "ENGINEERING".split("");
+
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (!word.current) return;
     const { gsap, ScrollTrigger } = ensureGsap();
     const el = word.current;
+    
+    // Calculate depths for parallax
+    const chars = Array.from(el.querySelectorAll(".foot-char")) as HTMLElement[];
+    chars.forEach((c) => {
+      // 2-8px depth based on horizontal position from center
+      const r = c.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const normalizedDist = Math.abs(cx - window.innerWidth / 2) / (window.innerWidth / 2);
+      c.dataset.depth = (2 + normalizedDist * 6).toString(); // range 2 to 8
+    });
+
+    const onMove = (e: MouseEvent) => {
+      const mx = e.clientX;
+      const my = e.clientY;
+      chars.forEach((c) => {
+        const r = c.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = mx - cx;
+        const dy = my - cy;
+        
+        const depth = parseFloat(c.dataset.depth || "5");
+        // Translate by dx/windowWidth * depth => up to depth px
+        const moveX = (dx / window.innerWidth) * depth;
+        const moveY = (dy / window.innerHeight) * depth;
+        
+        gsap.to(c, {
+          x: moveX,
+          y: moveY,
+          duration: 0.6,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      });
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
@@ -47,6 +87,7 @@ export default function Footer() {
       );
     }, el);
     return () => {
+      window.removeEventListener("mousemove", onMove);
       ScrollTrigger.getAll().forEach((t) => {
         if (t.trigger === el) t.kill();
       });
@@ -139,8 +180,8 @@ export default function Footer() {
           className="font-display leading-[0.85] text-center flex flex-col"
           style={{ fontSize: "clamp(50px, 14vw, 220px)", marginBottom: "-0.3em", letterSpacing: "var(--tr-display-tight)" }}
         >
-          <span>AGENTIC</span>
-          <span>ENGINEERING</span>
+          <span className="flex justify-center">{word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
+          <span className="flex justify-center">{word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
         </h2>
       </div>
     </footer>
