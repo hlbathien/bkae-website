@@ -262,7 +262,9 @@ Rules:
 
 ### 15.3 Page transitions
 
-- First visit: 900ms curtain intro — black panel wipes upward, reveals hero. Stored in `sessionStorage` so subsequent navigations skip.
+- First visit: 4-stage loader (1.6s) ending in 4-panel stagger wipe. Stored in `sessionStorage.ae:visit-count`.
+- Returning visit: 320ms top hairline sweep.
+- Reduced-motion: skips instantly.
 - Route change: 400ms curtain-fade overlay (amber 4% → ink), then new page RevealText.
 - Shared element morph is out-of-scope v1.
 
