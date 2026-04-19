@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LogoMark from "@/components/primitives/LogoMark";
+import MagneticBtn from "@/components/motion/MagneticBtn";
 
 const NAV = [
   { href: "/projects", label: "Projects" },
@@ -64,12 +65,12 @@ export default function Header() {
             >
               <Github size={14} /> Github
             </a>
-            <Link
+            <MagneticBtn
               href="/join"
               className="cta-fill border border-[var(--color-amber)] px-4 py-2 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-amber)]"
             >
               Join
-            </Link>
+            </MagneticBtn>
             <button aria-label="Open menu" className="md:hidden" onClick={() => setOpen(true)}>
               <Menu size={20} />
             </button>

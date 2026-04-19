@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Frame from "@/components/primitives/Frame";
+import MagneticBtn from "@/components/motion/MagneticBtn";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -121,13 +122,13 @@ export default function JoinPage() {
             <p className="text-sm text-[var(--color-amber)]">{submitError}</p>
           )}
 
-          <button
+          <MagneticBtn
             type="submit"
             disabled={isSubmitting}
-            className="cta-fill mt-4 inline-flex w-fit items-center gap-3 border border-[var(--color-amber)] px-6 py-4 text-[12px] uppercase tracking-[0.22em] text-[var(--color-amber)] disabled:opacity-50"
+            className="cta-fill mt-4 w-fit inline-flex items-center justify-center gap-3 border border-[var(--color-amber)] px-6 py-4 text-[12px] uppercase tracking-[0.22em] text-[var(--color-amber)] disabled:opacity-50"
           >
             {isSubmitting ? "Submitting..." : "Submit application →"}
-          </button>
+          </MagneticBtn>
         </form>
       )}
     </Frame>

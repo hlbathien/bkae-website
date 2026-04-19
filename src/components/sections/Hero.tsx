@@ -190,13 +190,12 @@ export default function Hero() {
           >
             Apply — founding cohort <ArrowRight size={14} />
           </MagneticBtn>
-          <Link
+          <MagneticBtn
             href="/projects"
-            data-cursor="link"
             className="inline-flex items-center gap-2 border border-[var(--color-ink3)] px-6 py-3 text-[12px] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:border-[var(--color-amber)] hover:text-[var(--color-amber)] transition-colors duration-150"
           >
             View shipped work →
-          </Link>
+          </MagneticBtn>
         </div>
 
         {/* Live build band */}

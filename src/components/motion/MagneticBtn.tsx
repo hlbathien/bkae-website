@@ -8,13 +8,14 @@ export default function MagneticBtn({
   href,
   onClick,
   strength = 0.25,
+  ...rest
 }: {
   children: React.ReactNode;
   className?: string;
   href?: string;
   onClick?: () => void;
   strength?: number;
-}) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement> & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -44,13 +45,13 @@ export default function MagneticBtn({
 
   if (href) {
     return (
-      <a ref={ref as never} href={href} data-cursor="magnet" className={className}>
+      <a ref={ref as never} href={href} data-cursor="magnet" className={className} {...rest}>
         {children}
       </a>
     );
   }
   return (
-    <button ref={ref as never} onClick={onClick} data-cursor="magnet" className={className}>
+    <button ref={ref as never} onClick={onClick} data-cursor="magnet" className={className} {...rest}>
       {children}
     </button>
   );

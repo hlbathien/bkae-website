@@ -1,7 +1,10 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState, createContext } from "react";
 import Lenis from "lenis";
 import { ensureGsap } from "@/lib/gsap";
+import { useScrollSnap } from "@/hooks/useScrollSnap";
+
+export const ScrollContext = createContext<{ lenis: Lenis | null }>({ lenis: null });
 
 declare global {
   interface Window {
@@ -16,6 +19,8 @@ declare global {
  * native line-step scrolling.
  */
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -35,6 +40,8 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       stopInertiaOnNavigate: true,
     });
     window.__lenis = lenis;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLenisInstance(lenis);
 
     const syncLenisWithGsap = (time: number) => {
       lenis.raf(time * 1000);
@@ -60,8 +67,19 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       window.removeEventListener("resize", onResize);
       lenis.destroy();
       delete window.__lenis;
+      setLenisInstance(null);
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <ScrollContext.Provider value={{ lenis: lenisInstance }}>
+      <ScrollSnapActivator />
+      {children}
+    </ScrollContext.Provider>
+  );
+}
+
+function ScrollSnapActivator() {
+  useScrollSnap();
+  return null;
 }
