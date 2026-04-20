@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export default function Header() {
   const [overManifesto, setOverManifesto] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => {
@@ -37,12 +39,12 @@ export default function Header() {
       <header
         ref={ref}
         className={cn(
-          "fixed left-0 right-0 top-9 z-40 transition-[height,background,border-color] duration-300",
+          "fixed left-0 right-0 top-9 z-40 transition-all duration-300",
           shrunk
             ? overManifesto
               ? "h-14 bg-[rgba(245,240,232,0.9)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"
               : "h-14 bg-[rgba(12,12,9,0.7)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
-            : "h-20 bg-transparent",
+            : "h-20 bg-transparent mix-blend-difference",
         )}
       >
         <div className={cn("mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)] transition-colors duration-300", overManifesto ? "text-[var(--color-ink)]" : "text-[var(--color-ivory)]")}>
@@ -55,20 +57,27 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
-            {NAV.map((n) => (
+            {NAV.map((n) => {
+              const active = pathname?.startsWith(n.href);
+              return (
               <Link
                 key={n.href}
                 href={n.href}
                 className={cn(
-                  "draw-underline text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)]",
-                  overManifesto 
-                    ? "text-[var(--color-ink)] hover:text-[var(--color-amber)]" 
-                    : "text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]"
+                  "relative py-1 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] transition-colors",
+                  active 
+                    ? "text-[var(--color-amber)]" 
+                    : (overManifesto 
+                      ? "text-[var(--color-ink)] hover:text-[var(--color-amber)]" 
+                      : "text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]")
                 )}
               >
                 {n.label}
+                {active && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[var(--color-amber)]" />
+                )}
               </Link>
-            ))}
+            )})}
           </nav>
 
           <div className="flex items-center gap-4">
