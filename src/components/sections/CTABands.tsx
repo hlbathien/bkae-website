@@ -109,7 +109,13 @@ function Band({
         ref={imgWrap} 
         className="pointer-events-none absolute left-0 top-0 z-0 h-[200px] w-[300px] overflow-hidden rounded opacity-[0.25] mix-blend-screen"
       >
-        <Image src={img} alt="" fill className="object-cover" />
+        <Image 
+          src={img} 
+          alt="" 
+          fill 
+          className="object-cover" 
+          sizes="300px"
+        />
       </div>
 
       {/* amber wipe bg on hover — <200ms to respect motion contract */}

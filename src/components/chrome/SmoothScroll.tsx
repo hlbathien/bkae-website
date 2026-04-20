@@ -51,7 +51,13 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     lenis.on("scroll", ScrollTrigger.update);
 
-    const refresh = () => ScrollTrigger.refresh();
+    const refresh = () => {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        window.requestIdleCallback(() => ScrollTrigger.refresh());
+      } else {
+        setTimeout(() => ScrollTrigger.refresh(), 100);
+      }
+    };
     const onLoad = () => refresh();
     const onResize = () => refresh();
     window.addEventListener("load", onLoad);

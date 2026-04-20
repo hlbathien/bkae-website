@@ -9,7 +9,14 @@ import dynamic from "next/dynamic";
 import { ArrowRight } from "lucide-react";
 import { ensureGsap } from "@/lib/gsap";
 
-const HeroBlob = dynamic(() => import("@/components/motion/HeroBlob"), { ssr: false });
+const HeroBlob = dynamic(() => import("@/components/motion/HeroBlob"), { 
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="h-1 w-1 rounded-full bg-[var(--color-amber)] animate-pulse" />
+    </div>
+  )
+});
 
 const KEYWORDS =
   "VIBE CODING · DETERMINISTIC · BOUNDED · SHIP · MEASURE · TRACEABLE · REFUSABLE · ";

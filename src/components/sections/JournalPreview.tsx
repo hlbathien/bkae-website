@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Frame from "@/components/primitives/Frame";
 import { posts } from "@/lib/cms";
 
@@ -47,10 +48,15 @@ export default function JournalPreview() {
             className="group col-span-1 row-span-2 border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-8 transition-colors duration-150 hover:border-[var(--color-amber)] md:col-span-2"
           >
             <div className="journal-cover-wrap aspect-[16/9] w-full">
-              <div
-                className="journal-cover-img h-full w-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url(${hero.cover})` }}
-              />
+              <div className="journal-cover-img h-full w-full relative">
+                <Image 
+                  src={hero.cover} 
+                  alt="" 
+                  fill 
+                  className="object-cover" 
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                />
+              </div>
               <div className="journal-scanline" />
             </div>
             <div className="mt-6 flex items-center gap-3 eyebrow-sm text-[var(--color-steel)]">
@@ -75,10 +81,15 @@ export default function JournalPreview() {
               className="group border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-6 transition-colors duration-150 hover:border-[var(--color-amber)]"
             >
               <div className="journal-cover-wrap aspect-[4/3] w-full">
-                 <div
-                   className="journal-cover-img h-full w-full bg-cover bg-center bg-no-repeat"
-                   style={{ backgroundImage: `url(${p.cover})` }}
-                 />
+                 <div className="journal-cover-img h-full w-full relative">
+                   <Image 
+                     src={p.cover} 
+                     alt="" 
+                     fill 
+                     className="object-cover" 
+                     sizes="(max-width: 768px) 100vw, 33vw"
+                   />
+                 </div>
                  <div className="journal-scanline" />
               </div>
               <div className="mt-4 flex items-center gap-3 eyebrow-sm text-[var(--color-steel)]">
