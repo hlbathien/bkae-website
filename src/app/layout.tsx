@@ -3,6 +3,7 @@ import "./globals.css";
 import { syne, instrumentSerif, dmMono } from "@/lib/fonts";
 import Header from "@/components/chrome/Header";
 import Footer from "@/components/chrome/Footer";
+import LiveBand from "@/components/chrome/LiveBand";
 import MarqueeBar from "@/components/chrome/MarqueeBar";
 import GridOverlay from "@/components/chrome/GridOverlay";
 import Cursor from "@/components/chrome/Cursor";
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             Skip to content
           </a>
+          <LiveBand />
           <MarqueeBar />
           <Header />
           <GridOverlay />

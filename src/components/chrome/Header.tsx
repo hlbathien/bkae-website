@@ -39,7 +39,8 @@ export default function Header() {
       <header
         ref={ref}
         className={cn(
-          "fixed left-0 right-0 top-9 z-40 transition-all duration-300",
+          "fixed left-0 right-0 z-40 transition-all duration-300",
+          shrunk ? "top-0" : "top-[60px]",
           shrunk
             ? overManifesto
               ? "h-14 bg-[rgba(245,240,232,0.9)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"
