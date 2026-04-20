@@ -53,6 +53,7 @@ export default function ScrollRail() {
   const [sections, setSections] = useState<RailSection[]>([]);
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [history, setHistory] = useState<number[]>([]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -72,6 +73,8 @@ export default function ScrollRail() {
         lastSectionIds = markerIds;
         setSections(markers.map(({ id, label }) => ({ id, label })));
         lastActive = -1;
+        setActive(0);
+        setHistory([]);
       }
 
       const scrollY = window.scrollY;
@@ -82,8 +85,6 @@ export default function ScrollRail() {
       const mainTop = mainRect.top + scrollY;
       const mainBottom = mainTop + mainRect.height;
 
-      // Progress spans the current route's main content only, so each page
-      // fills the rail based on its own length instead of the shared footer.
       const span = Math.max(1, mainBottom - mainTop - window.innerHeight);
       const p = Math.min(1, Math.max(0, (scrollY - mainTop) / span));
 
@@ -96,6 +97,7 @@ export default function ScrollRail() {
         if (lastActive !== 0) {
           lastActive = 0;
           setActive(0);
+          setHistory([]);
         }
         return;
       }
@@ -107,6 +109,13 @@ export default function ScrollRail() {
       }
 
       if (current !== lastActive) {
+        if (lastActive !== -1) {
+          setHistory((prev) => {
+            return [lastActive, ...prev]
+              .filter((x) => x !== current && x !== -1)
+              .slice(0, 3);
+          });
+        }
         lastActive = current;
         setActive(current);
       }
@@ -122,32 +131,48 @@ export default function ScrollRail() {
       className="pointer-events-none fixed top-1/2 z-30 hidden -translate-y-1/2 lg:block"
       style={{ left: "max(20px, calc(var(--gutter) * 0.35))" }}
     >
-      <div className="relative flex h-[60vh] flex-col items-start">
+      <div className="relative flex h-[60vh] flex-col items-start w-8">
         <div className="absolute left-[5px] top-0 h-full w-px bg-[var(--color-ink3)]" />
         <div
           className="absolute left-[5px] top-0 w-px bg-[var(--color-amber)]"
           style={{ height: `${progress * 100}%` }}
         />
         {sections.length > 0 && (
-          <ul className="relative flex h-full flex-col justify-between">
+          <ul className="relative flex h-full flex-col justify-between w-full pointer-events-auto">
             {sections.map((s, i) => {
               const isActive = i === active;
+              const trailIndex = history.indexOf(i);
+              const trailDepth = trailIndex !== -1 ? trailIndex : -1;
+
+              // Different opacity/scales based on trail age: 0 is newest
+              let scale = "scale-100";
+              let color = "bg-[var(--color-ink)] border-[var(--color-ink3)]";
+              
+              if (isActive) {
+                scale = "scale-110";
+                color = "bg-[var(--color-amber)] border-[var(--color-amber)]";
+              } else if (trailDepth === 0) {
+                scale = "scale-105";
+                color = "bg-[var(--color-amber-pale)] border-[var(--color-amber-hot)]";
+              } else if (trailDepth === 1) {
+                scale = "scale-100";
+                color = "bg-[var(--color-ink)] border-[var(--color-amber-pale)]";
+              }
+
               return (
-                <li key={s.id} className="relative flex items-center gap-3">
-                  <span
-                    className={`block h-[11px] w-[11px] rounded-full border transition-all duration-300 ${
-                      isActive
-                        ? "bg-[var(--color-amber)] border-[var(--color-amber)] scale-110"
-                        : "bg-[var(--color-ink)] border-[var(--color-ink3)]"
-                    }`}
-                  />
-                  <span
-                    className={`font-[var(--font-mono)] text-[10px] uppercase tracking-[0.18em] transition-opacity duration-300 ${
-                      isActive
-                        ? "opacity-100 text-[var(--color-amber)]"
-                        : "opacity-30 text-[var(--color-steel)]"
-                    }`}
+                <li key={s.id} className="group relative flex items-center">
+                  <button
+                    data-cursor="link"
+                    className="flex h-6 w-6 items-center justify-start focus:outline-none -ml-[7px]"
+                    onClick={() => {
+                        window.__lenis?.scrollTo(`[data-section="${s.id}"]`);
+                    }}
                   >
+                    <span
+                      className={`block h-[11px] w-[11px] rounded-full border transition-all duration-[800ms] ${scale} ${color}`}
+                    />
+                  </button>
+                  <span className="pointer-events-none absolute left-6 -translate-x-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 font-[var(--font-mono)] text-[10px] uppercase tracking-[0.1em] text-[var(--color-amber)] whitespace-nowrap bg-[rgba(12,12,9,0.9)] backdrop-blur-md px-2 py-1 border border-[var(--color-ink3)] rounded drop-shadow-md">
                     {String(i + 1).padStart(2, "0")} · {s.label}
                   </span>
                 </li>
