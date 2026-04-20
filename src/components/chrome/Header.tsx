@@ -14,11 +14,19 @@ const NAV = [
 
 export default function Header() {
   const [shrunk, setShrunk] = useState(false);
+  const [overManifesto, setOverManifesto] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setShrunk(window.scrollY > 24);
+    const onScroll = () => {
+      setShrunk(window.scrollY > 24);
+      const m = document.getElementById("manifesto");
+      if (m) {
+        const r = m.getBoundingClientRect();
+        setOverManifesto(r.top < 80 && r.bottom > 0);
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -29,16 +37,18 @@ export default function Header() {
       <header
         ref={ref}
         className={cn(
-          "fixed left-0 right-0 top-9 z-40 transition-[height,background] duration-300",
+          "fixed left-0 right-0 top-9 z-40 transition-[height,background,border-color] duration-300",
           shrunk
-            ? "h-14 bg-[rgba(12,12,9,0.7)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
+            ? overManifesto
+              ? "h-14 bg-[rgba(245,240,232,0.9)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"
+              : "h-14 bg-[rgba(12,12,9,0.7)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
             : "h-20 bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)]">
+        <div className={cn("mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)] transition-colors duration-300", overManifesto ? "text-[var(--color-ink)]" : "text-[var(--color-ivory)]")}>
           <Link
             href="/"
-            className="font-display flex items-center gap-2 text-[18px] tracking-tight text-[var(--color-ivory)]"
+            className="font-display flex items-center gap-2 text-[18px] tracking-tight"
           >
             <LogoMark size={14} className="text-[var(--color-amber)]" />
             <span>agentic engineering<span className="text-[var(--color-amber)]">.</span></span>
@@ -49,7 +59,12 @@ export default function Header() {
               <Link
                 key={n.href}
                 href={n.href}
-                className="draw-underline text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]"
+                className={cn(
+                  "draw-underline text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)]",
+                  overManifesto 
+                    ? "text-[var(--color-ink)] hover:text-[var(--color-amber)]" 
+                    : "text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]"
+                )}
               >
                 {n.label}
               </Link>
@@ -61,7 +76,10 @@ export default function Header() {
               href="https://github.com/inference-club"
               target="_blank"
               rel="noreferrer"
-              className="hidden md:inline-flex items-center gap-2 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel-light)] hover:text-[var(--color-amber)]"
+              className={cn(
+                "hidden md:inline-flex items-center gap-2 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] hover:text-[var(--color-amber)]",
+                overManifesto ? "text-[var(--color-ink)]" : "text-[var(--color-steel-light)]"
+              )}
             >
               <Github size={14} /> Github
             </a>

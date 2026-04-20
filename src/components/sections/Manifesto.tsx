@@ -5,14 +5,49 @@ import RevealText from "@/components/motion/RevealText";
 import { ensureGsap } from "@/lib/gsap";
 
 export default function Manifesto() {
+  const rootRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  const numeralRef = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
-    if (typeof window === "undefined" || !textRef.current) return;
+    if (typeof window === "undefined" || !textRef.current || !rootRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     
     const { gsap } = ensureGsap();
     
+    const ctx = gsap.context(() => {
+      // Background lerp
+      gsap.fromTo(
+        rootRef.current,
+        { backgroundColor: "#0c0c09", color: "#f5f0e8" },
+        {
+          backgroundColor: "#f5f0e8",
+          color: "#0c0c09",
+          ease: "none",
+          scrollTrigger: {
+            trigger: rootRef.current,
+            start: "top bottom",
+            end: "top center",
+            scrub: true,
+          }
+        }
+      );
+
+      // Giant 01 parallax
+      if (numeralRef.current) {
+        gsap.to(numeralRef.current, {
+          yPercent: -30,
+          ease: "none",
+          scrollTrigger: {
+            trigger: rootRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          }
+        });
+      }
+    });
+
     // GSAP runs after DOM repaints and fonts load, but just in case, wait a tick
     const t = setTimeout(() => {
       const words = Array.from(textRef.current!.querySelectorAll("[data-r]")) as HTMLElement[];
@@ -70,18 +105,22 @@ export default function Manifesto() {
       });
     }, 100);
 
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      ctx.revert();
+    };
   }, []);
 
   return (
     <section
+      ref={rootRef}
       id="manifesto"
       data-section="manifesto"
-      className="relative flex min-h-[90svh] items-center overflow-hidden section-pad"
-      style={{ backgroundColor: "var(--color-ivory)", color: "var(--color-ink)" }}
+      className="relative flex min-h-[90svh] items-center overflow-hidden section-pad bg-[var(--color-ivory)] text-[var(--color-ink)]"
     >
       {/* ink/amber floating editorial marks */}
       <span
+        ref={numeralRef}
         aria-hidden
         className="font-display absolute left-[calc(var(--gutter)*-0.3)] top-[var(--space-section-sm)] text-[var(--color-ink)] opacity-[0.05] pointer-events-none select-none"
         style={{ fontSize: "clamp(160px, 28vw, 480px)", lineHeight: 0.8, fontWeight: 800 }}

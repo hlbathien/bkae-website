@@ -58,6 +58,7 @@ export default function Cursor() {
   const targetRef = useRef<HTMLElement | null>(null);
 
   const [active, setActive] = useState(false);
+  const [overIvory, setOverIvory] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -132,7 +133,17 @@ export default function Cursor() {
       return null;
     };
 
+    const isOverIvory = (el: EventTarget | null): boolean => {
+      let node = el as HTMLElement | null;
+      while (node && node !== document.body) {
+        if (node.dataset && node.dataset.section === "manifesto") return true;
+        node = node.parentElement;
+      }
+      return false;
+    };
+
     const onOver = (e: MouseEvent) => {
+      setOverIvory(isOverIvory(e.target));
       const hit = findTarget(e.target);
       if (hit) {
         targetRef.current = hit.el;
@@ -245,12 +256,12 @@ export default function Cursor() {
       <div
         ref={ring}
         aria-hidden
-        className={`pointer-events-none fixed left-0 top-0 z-[60] border mix-blend-difference flex items-center justify-center transition-colors duration-200 ${targetMetrics.borderClass}`}
+        className={`pointer-events-none fixed left-0 top-0 z-[60] border flex items-center justify-center transition-colors duration-200 ${targetMetrics.borderClass} ${overIvory ? "mix-blend-normal !border-[var(--color-ink)]" : "mix-blend-difference"}`}
         style={{ willChange: "transform, width, height" }}
       >
         {labelText && (
           <span
-            className="font-[var(--font-mono)] text-[9px] uppercase tracking-[0.18em] text-[var(--color-ivory)] mix-blend-difference"
+            className={`font-[var(--font-mono)] text-[9px] uppercase tracking-[0.18em] ${overIvory ? "text-[var(--color-ink)] mix-blend-normal" : "text-[var(--color-ivory)] mix-blend-difference"}`}
           >
             {labelText}
           </span>
@@ -258,14 +269,14 @@ export default function Cursor() {
       </div>
       
       {/* Trail */}
-      <div ref={el => { trailRef.current[0] = el; }} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[58] border border-[var(--color-amber)] mix-blend-difference opacity-40 will-change-transform" />
-      <div ref={el => { trailRef.current[1] = el; }} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[58] border border-[var(--color-amber)] mix-blend-difference opacity-25 will-change-transform" />
-      <div ref={el => { trailRef.current[2] = el; }} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[58] border border-[var(--color-amber)] mix-blend-difference opacity-[0.12] will-change-transform" />
+      <div ref={el => { trailRef.current[0] = el; }} aria-hidden className={`pointer-events-none fixed left-0 top-0 z-[58] border opacity-40 will-change-transform ${overIvory ? "border-[var(--color-ink)] mix-blend-normal" : "border-[var(--color-amber)] mix-blend-difference"}`} />
+      <div ref={el => { trailRef.current[1] = el; }} aria-hidden className={`pointer-events-none fixed left-0 top-0 z-[58] border opacity-25 will-change-transform ${overIvory ? "border-[var(--color-ink)] mix-blend-normal" : "border-[var(--color-amber)] mix-blend-difference"}`} />
+      <div ref={el => { trailRef.current[2] = el; }} aria-hidden className={`pointer-events-none fixed left-0 top-0 z-[58] border opacity-[0.12] will-change-transform ${overIvory ? "border-[var(--color-ink)] mix-blend-normal" : "border-[var(--color-amber)] mix-blend-difference"}`} />
 
       <div
         ref={dot}
         aria-hidden
-        className={`pointer-events-none fixed left-0 top-0 z-[61] h-1.5 w-1.5 rounded-full bg-[var(--color-amber)] transition-opacity duration-150 will-change-transform ${
+        className={`pointer-events-none fixed left-0 top-0 z-[61] h-1.5 w-1.5 rounded-full transition-opacity duration-150 will-change-transform ${overIvory ? "bg-[var(--color-ink)]" : "bg-[var(--color-amber)]"} ${
           dotHidden ? "opacity-0" : "opacity-100"
         }`}
       />

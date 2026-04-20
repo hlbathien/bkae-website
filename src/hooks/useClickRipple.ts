@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export function useClickRipple<T extends HTMLElement>(ref: React.RefObject<T | null>) {
   useEffect(() => {
