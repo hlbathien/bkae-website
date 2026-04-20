@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ensureGsap } from "@/lib/gsap";
 import LogoMark from "@/components/primitives/LogoMark";
 
@@ -26,9 +26,20 @@ function Clock() {
 
 export default function Footer() {
   const word = useRef<HTMLHeadingElement>(null);
+  const [verticalMode, setVerticalMode] = useState(false);
 
   const word1 = "AGENTIC".split("");
   const word2 = "ENGINEERING".split("");
+
+  const handleCopyrightClick = (e: React.MouseEvent) => {
+    if (e.detail === 3) {
+      setVerticalMode(true);
+      setTimeout(() => setVerticalMode(false), 4000);
+      try {
+        console.log("%c[ VERTICAL STACK ENGAGED ]", "color:#d4870a;font-family:monospace;");
+      } catch {}
+    }
+  };
 
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
@@ -39,13 +50,16 @@ export default function Footer() {
     
     // Calculate depths for parallax
     const chars = Array.from(el.querySelectorAll(".foot-char")) as HTMLElement[];
-    chars.forEach((c) => {
-      // 2-8px depth based on horizontal position from center
-      const r = c.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const normalizedDist = Math.abs(cx - window.innerWidth / 2) / (window.innerWidth / 2);
-      c.dataset.depth = (2 + normalizedDist * 6).toString(); // range 2 to 8
-    });
+    
+    const recalculateDepths = () => {
+      chars.forEach((c) => {
+        const r = c.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const normalizedDist = Math.abs(cx - window.innerWidth / 2) / (window.innerWidth / 2);
+        c.dataset.depth = (2 + normalizedDist * 6).toString();
+      });
+    };
+    recalculateDepths();
 
     const onMove = (e: MouseEvent) => {
       const mx = e.clientX;
@@ -58,7 +72,6 @@ export default function Footer() {
         const dy = my - cy;
         
         const depth = parseFloat(c.dataset.depth || "5");
-        // Translate by dx/windowWidth * depth => up to depth px
         const moveX = (dx / window.innerWidth) * depth;
         const moveY = (dy / window.innerHeight) * depth;
         
@@ -86,6 +99,7 @@ export default function Footer() {
         },
       );
     }, el);
+
     return () => {
       window.removeEventListener("mousemove", onMove);
       ScrollTrigger.getAll().forEach((t) => {
@@ -159,7 +173,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 border-t border-[var(--color-ink3)] pt-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel)]">
-          <span>
+          <span onClick={handleCopyrightClick} className="cursor-default select-none">
             Crafted in{" "}
             <span className="font-serif-italic text-[var(--color-amber)] normal-case">
               Ho Chi Minh City
@@ -180,11 +194,18 @@ export default function Footer() {
       >
         <h2
           ref={word}
-          className="font-display leading-[0.85] text-center flex flex-col"
-          style={{ fontSize: "clamp(50px, 14vw, 220px)", marginBottom: "-0.3em", letterSpacing: "var(--tr-display-tight)" }}
+          className="font-display leading-[0.85] text-center flex flex-col transition-all duration-1000 ease-[var(--ease-out-expo)]"
+          style={{ 
+            fontSize: "clamp(50px, 14vw, 220px)", 
+            marginBottom: "-0.3em", 
+            letterSpacing: "var(--tr-display-tight)",
+            flexDirection: verticalMode ? "column" : "column",
+            gap: verticalMode ? "1.5em" : "0",
+            transform: verticalMode ? "scale(0.4)" : "scale(1)"
+          }}
         >
-          <span className="flex justify-center">{word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
-          <span className="flex justify-center">{word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
+          <span className="flex justify-center flex-wrap">{word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
+          <span className="flex justify-center flex-wrap">{word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
         </h2>
         <div
           dangerouslySetInnerHTML={{

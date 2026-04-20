@@ -424,3 +424,17 @@ input:focus, textarea:focus, select:focus {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes qwen-pulse {
+  0% { opacity: 0; }
+  20% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+.animate-qwen-pulse {
+  animation: qwen-pulse 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.invert-mode {
+  filter: invert(1) hue-rotate(180deg);
+  background: var(--color-ivory);
+}

@@ -39,6 +39,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${syne.variable} ${instrumentSerif.variable} ${dmMono.variable} bg-[var(--color-ink)] text-[var(--color-ivory)]`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+/**
+ * 
+ *   AGENTIC ENGINEERING · HCMUT
+ *   
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   [ . . . . . . . . . . . . . . . . . . ]
+ *   
+ *   BOUNDED LLMS · CONTRACT-BASED PIPELINES · SHIPPED SYSTEMS
+ *   v1.0.0-2026-AE
+ *
+ */
+`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <noscript>
           <div

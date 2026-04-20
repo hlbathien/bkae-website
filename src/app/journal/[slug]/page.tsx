@@ -4,6 +4,7 @@ import Frame from "@/components/primitives/Frame";
 import { posts } from "@/lib/cms";
 import ReadingProgress from "@/components/chrome/ReadingProgress";
 import ToCRail from "@/components/chrome/ToCRail";
+import QwenPulse from "@/components/motion/QwenPulse";
 
 export async function generateStaticParams() {
   return posts.map((p) => ({ slug: p.slug }));
@@ -38,6 +39,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <>
       <ReadingProgress />
       <ToCRail />
+      
+      {/* Easter egg: Qwen pulse */}
+      {slug === "qwen-hackathon" && <QwenPulse />}
       
       <Frame className="pt-40 pb-32">
         <Link
