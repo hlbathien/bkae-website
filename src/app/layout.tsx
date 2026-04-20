@@ -11,6 +11,7 @@ import SmoothScroll from "@/components/chrome/SmoothScroll";
 import ScrollRail from "@/components/chrome/ScrollRail";
 import PageTransition from "@/components/chrome/PageTransition";
 import AudioToggle from "@/components/chrome/AudioToggle";
+import LiveFavicon from "@/components/chrome/LiveFavicon";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inference.club"),
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GridOverlay />
           <ScrollRail />
           <AudioToggle />
+          <LiveFavicon />
           <Cursor />
           <main id="main">{children}</main>
           <Footer />
