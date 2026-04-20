@@ -158,14 +158,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 flex items-center justify-between text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel)]">
+        <div className="mt-16 border-t border-[var(--color-ink3)] pt-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-steel)]">
           <span>
             Crafted in{" "}
             <span className="font-serif-italic text-[var(--color-amber)] normal-case">
               Ho Chi Minh City
             </span>
           </span>
-          <span className="font-[var(--font-mono)] normal-case tracking-normal text-[var(--color-ivory2)]">
+          <span className="font-[var(--font-mono)] normal-case tracking-normal text-[var(--color-ivory2)] flex items-center gap-6">
+            <span className="text-[var(--color-steel)] opacity-60 pointer-events-auto">
+              commit: {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.substring(0, 7) || "a1b2c3d"}
+            </span>
             <Clock />
           </span>
         </div>
@@ -183,6 +186,19 @@ export default function Footer() {
           <span className="flex justify-center">{word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
           <span className="flex justify-center">{word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
         </h2>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<!--
+      _    ____ _____ _   _ _____ ___ ____ 
+     / \\  / ___| ____| \\ | |_   _|_ |  _ \\
+    / _ \\| |  _|  _| |  \\| | | |  | | | | |
+   / ___ \\ |_| | |___| |\\  | | |  | | |_| |
+  /_/   \\_\\____|_____|_| \\_| |_| |___|____/
+                                           
+                  ENGINEERING              
+-->`,
+          }}
+        />
       </div>
     </footer>
   );
