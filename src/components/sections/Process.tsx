@@ -8,33 +8,96 @@ export default function Process() {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
 
+  const mobileTrack = useRef<HTMLOListElement>(null);
+
   useLayoutEffect(() => {
     if (!section.current || !track.current) return;
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(max-width: 1024px)").matches) return;
     const { gsap, ScrollTrigger } = ensureGsap();
     const sectionEl = section.current;
     const trackEl = track.current;
 
     const ctx = gsap.context(() => {
+      // Mobile stagger
+      if (window.matchMedia("(max-width: 1024px)").matches) {
+        if (mobileTrack.current) {
+          gsap.from(mobileTrack.current.children, {
+            opacity: 0,
+            y: 24,
+            stagger: 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: mobileTrack.current,
+              start: "top 80%",
+            }
+          });
+        }
+        return;
+      }
+
       const getDistance = () => trackEl.scrollWidth - window.innerWidth + 200;
-      gsap.to(trackEl, {
-        x: () => -getDistance(),
-        ease: "none",
+      
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionEl,
           start: "top top",
           end: () => `+=${getDistance()}`,
           pin: true,
-          // Lenis moves page via transform on html/body; stacking pinType:"transform"
-          // on top causes double-translate → ghost frames. "fixed" pins via
-          // position:fixed which composites cleanly with Lenis.
           pinType: "fixed",
           anticipatePin: 1,
           scrub: 1,
           invalidateOnRefresh: true,
-        },
+        }
       });
+
+      tl.to(trackEl, {
+        x: () => -getDistance(),
+        ease: "none",
+      });
+
+      const edges = trackEl.querySelectorAll("[data-process-edge]");
+      if (edges.length) {
+        // Overlay the edge draws over the track movement
+        tl.fromTo(edges, 
+          { scaleX: 0 },
+          { scaleX: 1, stagger: 0.2, ease: "none", duration: tl.duration() },
+          0
+        );
+      }
+
+      // Drag Pan
+      let isDown = false;
+      let startX: number;
+      let startScrollY: number;
+
+      const down = (e: PointerEvent) => {
+        isDown = true;
+        startX = e.pageX;
+        startScrollY = window.scrollY;
+        trackEl.style.cursor = 'grabbing';
+      };
+
+      const leave = () => { isDown = false; trackEl.style.cursor = ''; };
+      const up = () => { isDown = false; trackEl.style.cursor = ''; };
+
+      const move = (e: PointerEvent) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const dx = e.pageX - startX;
+        window.scrollTo(0, startScrollY - dx * 2);
+      };
+
+      trackEl.addEventListener('pointerdown', down);
+      window.addEventListener('pointerleave', leave);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointermove', move);
+
+      return () => {
+        trackEl.removeEventListener('pointerdown', down);
+        window.removeEventListener('pointerleave', leave);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointermove', move);
+      };
     }, sectionEl);
 
     const refresh = () => ScrollTrigger.refresh();
@@ -43,9 +106,6 @@ export default function Process() {
     }
 
     return () => {
-      ScrollTrigger.getAll().forEach((tr) => {
-        if (tr.trigger && sectionEl.contains(tr.trigger)) tr.kill();
-      });
       ctx.revert();
     };
   }, []);
@@ -62,7 +122,7 @@ export default function Process() {
         <h2 className="font-display h-display-l text-[var(--color-ivory)]">
           A contract at every edge.
         </h2>
-        <ol className="mt-[var(--space-block)] space-y-8">
+        <ol ref={mobileTrack} className="mt-[var(--space-block)] space-y-8">
           {processNodes.map((n, i) => (
             <li key={n.id} className="border-l border-[var(--color-amber)] pl-5">
               <p className="eyebrow-sm text-[var(--color-amber)]">Stage {String(i + 1).padStart(2, "0")}</p>
@@ -83,29 +143,20 @@ export default function Process() {
         <div
           ref={track}
           data-cursor="drag"
-          className="mt-[var(--space-block)] inline-flex items-end gap-24 pl-[var(--gutter)] pr-[20vw] will-change-transform"
+          className="mt-[var(--space-block)] inline-flex items-end gap-24 pl-[var(--gutter)] pr-[20vw] will-change-transform touch-none select-none"
         >
           {processNodes.map((n, i) => (
             <div key={n.id} className="flex w-[56vw] flex-col">
               <span className="eyebrow-sm text-[var(--color-amber)]">Stage {String(i + 1).padStart(2, "0")}</span>
               <span
-                className="font-display mt-4 text-[var(--color-ivory)]"
+                className="font-display mt-4 text-[var(--color-ivory)] pointer-events-none"
                 style={{ fontSize: "clamp(56px, 7.5vw, 120px)", lineHeight: 0.92, letterSpacing: "var(--tr-display-tight)" }}
               >
                 {n.label}
               </span>
-              <span className="mt-6 max-w-md text-[var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-steel-light)]">{n.desc}</span>
+              <span className="mt-6 max-w-md text-[var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-steel-light)] pointer-events-none">{n.desc}</span>
               {i < processNodes.length - 1 && (
-                <svg className="mt-10 h-px w-[36vw] self-start" viewBox="0 0 100 1" preserveAspectRatio="none">
-                  <line
-                    x1="0"
-                    y1="0.5"
-                    x2="100"
-                    y2="0.5"
-                    stroke="var(--color-amber)"
-                    strokeDasharray="2 4"
-                  />
-                </svg>
+                <div data-process-edge className="mt-10 h-px w-[36vw] self-start origin-left bg-[var(--color-amber)]" />
               )}
             </div>
           ))}
