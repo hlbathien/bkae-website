@@ -99,7 +99,13 @@ export default function Header() {
             >
               Join
             </MagneticBtn>
-            <button aria-label="Open menu" className="md:hidden" onClick={() => setOpen(true)}>
+            <button 
+              aria-label={open ? "Close menu" : "Open menu"} 
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              className="md:hidden" 
+              onClick={() => setOpen(true)}
+            >
               <Menu size={20} />
             </button>
           </div>
@@ -107,30 +113,41 @@ export default function Header() {
       </header>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-[var(--color-ink)] md:hidden">
+        <div 
+          id="mobile-menu"
+          className="fixed inset-0 z-50 bg-[var(--color-ink)] md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+        >
           <div className="flex justify-end p-5">
             <button aria-label="Close menu" onClick={() => setOpen(false)}>
               <X size={24} />
             </button>
           </div>
-          <nav className="flex flex-col gap-6 px-[var(--gutter)] pt-10">
-            {NAV.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                onClick={() => setOpen(false)}
-                className="font-display text-[44px] text-[var(--color-ivory)]"
-              >
-                {n.label}
-              </Link>
-            ))}
-            <Link
-              href="/join"
-              onClick={() => setOpen(false)}
-              className="font-display text-[44px] text-[var(--color-amber)]"
-            >
-              Join →
-            </Link>
+          <nav className="px-[var(--gutter)] pt-10">
+            <ul className="flex flex-col gap-6">
+              {NAV.map((n) => (
+                <li key={n.href}>
+                  <Link
+                    href={n.href}
+                    onClick={() => setOpen(false)}
+                    className="font-display text-[44px] text-[var(--color-ivory)]"
+                  >
+                    {n.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/join"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-[44px] text-[var(--color-amber)]"
+                >
+                  Join →
+                </Link>
+              </li>
+            </ul>
           </nav>
         </div>
       )}

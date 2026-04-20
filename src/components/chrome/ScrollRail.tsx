@@ -126,9 +126,9 @@ export default function ScrollRail() {
   }, [pathname]);
 
   return (
-    <aside
-      aria-hidden
-      className="pointer-events-none fixed top-1/2 z-30 hidden -translate-y-1/2 lg:block"
+    <nav
+      aria-label="Section navigation"
+      className="fixed top-1/2 z-30 hidden -translate-y-1/2 lg:block"
       style={{ left: "max(20px, calc(var(--gutter) * 0.35))" }}
     >
       <div className="relative flex h-[60vh] flex-col items-start w-8">
@@ -163,6 +163,8 @@ export default function ScrollRail() {
                 <li key={s.id} className="group relative flex items-center">
                   <button
                     data-cursor="link"
+                    aria-label={`Scroll to ${s.label}`}
+                    aria-current={isActive ? "true" : undefined}
                     className="flex h-6 w-6 items-center justify-start focus:outline-none -ml-[7px]"
                     onClick={() => {
                         window.__lenis?.scrollTo(`[data-section="${s.id}"]`);
@@ -181,6 +183,6 @@ export default function ScrollRail() {
           </ul>
         )}
       </div>
-    </aside>
+    </nav>
   );
 }
