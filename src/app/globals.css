@@ -411,3 +411,11 @@ input:focus, textarea:focus, select:focus {
 .group:hover .cascade-char {
   color: var(--color-amber);
 }
+
+@keyframes progress-hairline {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.animate-progress-hairline {
+  animation: progress-hairline 2s linear infinite;
+}
