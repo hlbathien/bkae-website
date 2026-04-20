@@ -1,29 +1,58 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import { announcements } from "@/lib/cms";
 
 export default function MarqueeBar() {
   const [i, setI] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [dismissed, setDismissed] = useState(true); // true until mounted to avoid hydration mismatch
+
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDismissed(sessionStorage.getItem("ae:marquee-dismissed") === "1");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isHovered || dismissed) return;
     const t = setInterval(() => setI((p) => (p + 1) % announcements.length), 6000);
     return () => clearInterval(t);
-  }, []);
+  }, [isHovered, dismissed]);
+
+  if (dismissed) return null;
+
   const a = announcements[i];
 
   return (
-    <div className="fixed left-0 right-0 top-6 z-50 h-9 border-b border-[var(--color-ink3)] bg-[var(--color-ink2)] text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-ivory2)]">
-      <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)]">
-        <span className="text-[var(--color-steel-light)]">
-          <span className="text-[var(--color-amber)]">●</span> {a.text}
-        </span>
-        <Link
-          href={a.href}
-          className="inline-flex items-center gap-1 text-[var(--color-amber)] hover:text-[var(--color-amber-hot)]"
-        >
-          Learn more <ArrowUpRight size={12} />
+    <div 
+      className="group fixed left-0 right-0 top-6 z-50 h-9 border-b border-[var(--color-ink3)] bg-[var(--color-ink2)] text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] text-[var(--color-ivory2)]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)] relative">
+        <Link href={a.href} className="flex-1 flex items-center justify-between">
+          <span className="text-[var(--color-steel-light)]">
+            <span className="text-[var(--color-amber)]">●</span> {a.text}
+          </span>
+          <span className="inline-flex items-center gap-1 text-[var(--color-amber)] opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-[var(--color-amber-hot)]">
+            Learn more <ArrowUpRight size={12} />
+          </span>
         </Link>
+        <button
+          className="ml-6 flex items-center justify-center text-[var(--color-steel)] hover:text-[var(--color-amber)] transition-colors"
+          aria-label="Dismiss announcement"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            sessionStorage.setItem("ae:marquee-dismissed", "1");
+            setDismissed(true);
+          }}
+        >
+          <X size={14} />
+        </button>
       </div>
     </div>
   );
