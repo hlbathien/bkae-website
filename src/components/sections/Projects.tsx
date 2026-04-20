@@ -3,14 +3,69 @@ import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import Tag from "@/components/primitives/Tag";
 import CountUp from "@/components/motion/CountUp";
+import { useEffect, useRef } from "react";
+import { ensureGsap } from "@/lib/gsap";
 import { projects, type Project } from "@/lib/cms";
 import { ProjectArtifact } from "@/components/sections/ProjectDiagrams";
 
 function ProjectScene({ p, idx }: { p: Project; idx: number }) {
   const alt = idx % 2 === 1;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const diagramWrapRef = useRef<HTMLDivElement>(null);
+  const diagramInnerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !rootRef.current || !diagramInnerRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    
+    const { gsap, ScrollTrigger } = ensureGsap();
+    
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: rootRef.current,
+        pin: true,
+        start: "top top",
+        end: "+=100vh",
+        pinSpacing: true, // Need to make sure they stack
+      });
+
+      // Hover diagram tilt
+      const diagramInner = diagramInnerRef.current!;
+      const xTo = gsap.quickTo(diagramInner, "rotationY", { duration: 0.4, ease: "power3.out" });
+      const yTo = gsap.quickTo(diagramInner, "rotationX", { duration: 0.4, ease: "power3.out" });
+
+      const onMove = (e: MouseEvent) => {
+        const r = diagramInner.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        xTo(dx * 0.05); // max 2-3 degrees depending on width
+        yTo(dy * -0.05);
+      };
+
+      const onLeave = () => {
+        xTo(0);
+        yTo(0);
+      };
+
+      const diagramWrap = diagramWrapRef.current!;
+      diagramWrap.addEventListener("mousemove", onMove);
+      diagramWrap.addEventListener("mouseleave", onLeave);
+
+      return () => {
+        diagramWrap.removeEventListener("mousemove", onMove);
+        diagramWrap.removeEventListener("mouseleave", onLeave);
+      };
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <div
-      className="relative grid grid-cols-1 items-start gap-10 border-t border-[var(--color-ink3)] py-[var(--space-section-sm)] lg:grid-cols-12 lg:gap-16"
+      ref={rootRef}
+      className="relative grid grid-cols-1 items-center min-h-[100svh] gap-10 border-t border-[var(--color-ink3)] py-[var(--space-section-sm)] lg:grid-cols-12 lg:gap-16"
     >
       <div className={`min-w-0 lg:col-span-5 ${alt ? "lg:order-2" : ""}`}>
         <div className="flex items-baseline gap-4">
@@ -57,7 +112,7 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
           {p.stats.map((s) => (
             <div key={s.label} className="min-w-0">
               <div
-                className="font-display text-[var(--color-amber)] truncate"
+                className="font-display text-[var(--color-amber)] truncate stat-mask"
                 style={{ fontSize: "clamp(28px, 3vw, 44px)", lineHeight: 1, letterSpacing: "var(--tr-display-tight)" }}
               >
                 <CountUp to={s.value} suffix={s.suffix ?? ""} />
@@ -81,14 +136,16 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
       </div>
 
       <div className={`min-w-0 lg:col-span-7 ${alt ? "lg:order-1" : ""}`} data-cursor="view">
-        <div className="relative border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-4 md:p-8">
-          <div className="mb-3 flex items-center justify-between eyebrow-sm text-[var(--color-steel)]">
-            <span>
-              <span className="text-[var(--color-amber)]">●</span> diagram · {p.slug}
-            </span>
-            <span>live</span>
+        <div ref={diagramWrapRef} style={{ perspective: "1000px" }}>
+          <div ref={diagramInnerRef} className="relative border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-4 md:p-8" style={{ transformStyle: "preserve-3d" }}>
+            <div className="mb-3 flex items-center justify-between eyebrow-sm text-[var(--color-steel)]">
+              <span>
+                <span className="text-[var(--color-amber)]">●</span> diagram · {p.slug}
+              </span>
+              <span>live</span>
+            </div>
+            <ProjectArtifact slug={p.slug} />
           </div>
-          <ProjectArtifact slug={p.slug} />
         </div>
       </div>
     </div>

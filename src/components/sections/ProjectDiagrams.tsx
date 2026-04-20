@@ -33,6 +33,19 @@ export function LumenDiagram() {
         .to(edges, { strokeDashoffset: 0, duration: 0.9, stagger: 0.1 }, "-=0.4")
         .from(chips, { opacity: 0, duration: 0.4, stagger: 0.05 }, "-=0.6");
 
+      const highlights = svg.querySelectorAll<SVGRectElement>("[data-node-highlight]");
+      gsap.to(highlights, {
+        strokeDashoffset: 0,
+        ease: "none",
+        stagger: 0.2, // sequential
+        scrollTrigger: {
+          trigger: svg,
+          start: "center 80%",
+          end: "bottom 30%",
+          scrub: 1,
+        }
+      });
+
       // Pulse travels horizontally across the pipeline (x: 90 → 710, y: 300)
       const pulse = svg.querySelector<SVGCircleElement>("#lumen-pulse");
       if (pulse) {
@@ -127,6 +140,19 @@ export function LumenDiagram() {
             fill="url(#lumen-node)"
             stroke="var(--color-ink3)"
             strokeWidth="1"
+          />
+          <rect
+            data-node-highlight
+            x="-50"
+            y="-34"
+            width="100"
+            height="68"
+            fill="none"
+            stroke="var(--color-amber)"
+            strokeWidth="1"
+            pathLength="100"
+            strokeDasharray="100"
+            strokeDashoffset="100"
           />
           <text
             textAnchor="middle"
@@ -230,6 +256,21 @@ export function AtlasDiagram() {
         .from("[data-claim]", { opacity: 0, y: 10, stagger: 0.07, duration: 0.5, ease: "expo.out" }, "-=0.3")
         .to(arcs, { strokeDashoffset: 0, duration: 1.0, stagger: 0.08, ease: "expo.out" }, "-=0.4")
         .from("[data-refused]", { opacity: 0, scale: 0.9, duration: 0.4, ease: "back.out(1.6)" });
+
+      const refusedClaim = svg.querySelector<SVGGElement>("[data-claim]:last-child");
+      if (refusedClaim) {
+        gsap.to(refusedClaim, {
+          x: 6,
+          duration: 0.06,
+          yoyo: true,
+          repeat: 5,
+          ease: "none",
+          scrollTrigger: {
+            trigger: svg,
+            start: "top 55%", // when diagram enters focus
+          }
+        });
+      }
     }, svg);
     return () => {
       ScrollTrigger.getAll().forEach((t) => {
