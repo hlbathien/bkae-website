@@ -12,21 +12,21 @@ const BANDS = [
     label: "Join the founding cohort",
     kicker: "Apply · 4 slots open",
     accent: true,
-    img: "/cover-lumen.jpg", // placeholder
+    img: "/cover-lumen.svg", // placeholder
   },
   {
     href: "/projects",
     label: "View open-source projects",
     kicker: "Evidence · 02 shipped",
     accent: false,
-    img: "/cover-atlas.jpg", // placeholder
+    img: "/cover-atlas.svg", // placeholder
   },
   {
     href: "/journal",
     label: "Read the engineering journal",
     kicker: "Field notes · 03 essays",
     accent: false,
-    img: "/cover-lumen.jpg", // placeholder
+    img: "/cover-lumen.svg", // placeholder
   },
 ];
 

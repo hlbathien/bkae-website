@@ -78,15 +78,8 @@ export default function ScrollRail() {
       }
 
       const scrollY = window.scrollY;
-      const main = document.getElementById("main");
-      if (!main) return;
-
-      const mainRect = main.getBoundingClientRect();
-      const mainTop = mainRect.top + scrollY;
-      const mainBottom = mainTop + mainRect.height;
-
-      const span = Math.max(1, mainBottom - mainTop - window.innerHeight);
-      const p = Math.min(1, Math.max(0, (scrollY - mainTop) / span));
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const p = scrollHeight > 0 ? scrollY / scrollHeight : 0;
 
       if (Math.abs(p - lastProgress) > 0.001) {
         lastProgress = p;

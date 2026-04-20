@@ -39,7 +39,7 @@ export default function Stats() {
     <section ref={root} data-section="stats" className="border-t border-[var(--color-ink3)] section-pad">
       <Frame>
         <p className="eyebrow mb-10">Authority · 04</p>
-        <div className="grid max-w-[1280px] grid-cols-2 gap-x-10 gap-y-14 md:grid-cols-4">
+        <div className="grid max-w-[1280px] grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 md:grid-cols-4">
           {stats.map((s, i) => {
             // Give each sparkline slightly different data for visual interest
             const sparkData = Array.from({ length: 8 }).map(() =>
