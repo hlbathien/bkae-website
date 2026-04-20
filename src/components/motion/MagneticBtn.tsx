@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { cn } from "@/lib/utils";
+import { useClickRipple } from "@/hooks/useClickRipple";
 
 export default function MagneticBtn({
   children,
@@ -17,6 +19,7 @@ export default function MagneticBtn({
   strength?: number;
 } & React.ButtonHTMLAttributes<HTMLButtonElement> & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null);
+  useClickRipple(ref);
 
   useEffect(() => {
     const el = ref.current;
@@ -45,13 +48,13 @@ export default function MagneticBtn({
 
   if (href) {
     return (
-      <a ref={ref as never} href={href} data-cursor="magnet" className={className} {...rest}>
+      <a ref={ref as never} href={href} data-cursor="magnet" className={cn("cta-ripple", className)} {...rest}>
         {children}
       </a>
     );
   }
   return (
-    <button ref={ref as never} onClick={onClick} data-cursor="magnet" className={className} {...rest}>
+    <button ref={ref as never} onClick={onClick} data-cursor="magnet" className={cn("cta-ripple", className)} {...rest}>
       {children}
     </button>
   );
