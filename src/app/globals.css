@@ -375,3 +375,39 @@ input:focus, textarea:focus, select:focus {
     cursor: auto;
   }
 }
+
+.journal-cover-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.journal-cover-img {
+  transition: transform 10s var(--ease-out-expo);
+  transform: scale(1);
+}
+.group:hover .journal-cover-img {
+  transform: scale(1.05);
+}
+
+.journal-scanline {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--color-amber-hot) 2px, var(--color-amber-hot) 4px);
+  mix-blend-mode: color-dodge;
+  opacity: 0.3;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 800ms var(--ease-out-expo);
+  pointer-events: none;
+}
+.group:hover .journal-scanline {
+  transform: scaleY(1);
+}
+
+.cascade-char {
+  display: inline-block;
+  color: inherit;
+  transition: color 150ms ease-out, transform 300ms var(--ease-out-expo);
+}
+.group:hover .cascade-char {
+  color: var(--color-amber);
+}

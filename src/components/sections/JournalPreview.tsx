@@ -2,6 +2,22 @@ import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import { posts } from "@/lib/cms";
 
+function CascadeTitle({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+  return (
+    <h3 className={className} style={style}>
+      {text.split("").map((c, i) => (
+        <span
+          key={i}
+          className="cascade-char block"
+          style={{ transitionDelay: `${i * 12}ms` }}
+        >
+          {c === " " ? "\u00A0" : c}
+        </span>
+      ))}
+    </h3>
+  );
+}
+
 export default function JournalPreview() {
   const [hero, ...rest] = posts;
   const side = rest.slice(0, 2);
@@ -30,15 +46,22 @@ export default function JournalPreview() {
             data-cursor="read"
             className="group col-span-1 row-span-2 border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-8 transition-colors duration-150 hover:border-[var(--color-amber)] md:col-span-2"
           >
-            <div className="aspect-[16/9] w-full bg-gradient-to-br from-[var(--color-ink3)] via-[var(--color-ink2)] to-[var(--color-ink)]" />
+            <div className="journal-cover-wrap aspect-[16/9] w-full">
+              <div
+                className="journal-cover-img h-full w-full bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${hero.cover})` }}
+              />
+              <div className="journal-scanline" />
+            </div>
             <div className="mt-6 flex items-center gap-3 eyebrow-sm text-[var(--color-steel)]">
               <span className="text-[var(--color-amber)]">{hero.category}</span>
               <span>·</span>
               <span>{hero.readingTime}</span>
             </div>
-            <h3 className="font-display h-display-m mt-3 text-[var(--color-ivory)] group-hover:text-[var(--color-amber)] transition-colors duration-150">
-              {hero.title}
-            </h3>
+            <CascadeTitle
+              text={hero.title}
+              className="font-display h-display-m mt-3 text-[var(--color-ivory)] transition-colors duration-150 flex flex-wrap"
+            />
             <p className="mt-4 max-w-xl text-[var(--fs-body)] leading-[var(--lh-body)] text-[var(--color-steel-light)]">
               {hero.excerpt}
             </p>
@@ -51,18 +74,23 @@ export default function JournalPreview() {
               data-cursor="read"
               className="group border border-[var(--color-ink3)] bg-[var(--color-ink2)] p-6 transition-colors duration-150 hover:border-[var(--color-amber)]"
             >
-              <div className="aspect-[4/3] w-full bg-gradient-to-br from-[var(--color-ink3)] via-[var(--color-ink2)] to-[var(--color-ink)]" />
+              <div className="journal-cover-wrap aspect-[4/3] w-full">
+                 <div
+                   className="journal-cover-img h-full w-full bg-cover bg-center bg-no-repeat"
+                   style={{ backgroundImage: `url(${p.cover})` }}
+                 />
+                 <div className="journal-scanline" />
+              </div>
               <div className="mt-4 flex items-center gap-3 eyebrow-sm text-[var(--color-steel)]">
                 <span className="text-[var(--color-amber)]">{p.category}</span>
                 <span>·</span>
                 <span>{p.readingTime}</span>
               </div>
-              <h3
-                className="font-display mt-2 text-[var(--color-ivory)] group-hover:text-[var(--color-amber)] transition-colors duration-150"
+              <CascadeTitle
+                text={p.title}
+                className="font-display mt-2 text-[var(--color-ivory)] transition-colors duration-150 flex flex-wrap"
                 style={{ fontSize: "clamp(20px, 1.8vw, 26px)", letterSpacing: "var(--tr-display-tight)" }}
-              >
-                {p.title}
-              </h3>
+              />
             </Link>
           ))}
         </div>
