@@ -1,7 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useRef } from "react";
+import Image from "next/image";
+import { useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
+import { ensureGsap } from "@/lib/gsap";
+import { useClickRipple } from "@/hooks/useClickRipple";
 
 const BANDS = [
   {
@@ -9,18 +12,21 @@ const BANDS = [
     label: "Join the founding cohort",
     kicker: "Apply · 4 slots open",
     accent: true,
+    img: "/cover-lumen.jpg", // placeholder
   },
   {
     href: "/projects",
     label: "View open-source projects",
     kicker: "Evidence · 02 shipped",
     accent: false,
+    img: "/cover-atlas.jpg", // placeholder
   },
   {
     href: "/journal",
     label: "Read the engineering journal",
     kicker: "Field notes · 03 essays",
     accent: false,
+    img: "/cover-lumen.jpg", // placeholder
   },
 ];
 
@@ -29,40 +35,83 @@ function Band({
   label,
   kicker,
   accent,
+  img,
   index,
 }: {
   href: string;
   label: string;
   kicker: string;
   accent: boolean;
+  img: string;
   index: number;
 }) {
   const root = useRef<HTMLAnchorElement>(null);
   const word = useRef<HTMLSpanElement>(null);
+  const imgWrap = useRef<HTMLDivElement>(null);
+  useClickRipple(root);
 
-  // Text mask reveal: amber text overlays ivory text, clipped by circle at cursor
-  const onMove = (e: React.MouseEvent) => {
+  useEffect(() => {
+    if (typeof window === "undefined" || !imgWrap.current || !root.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const { gsap } = ensureGsap();
+    
+    const xTo = gsap.quickTo(imgWrap.current, "x", { duration: 0.4, ease: "power3.out" });
+    const yTo = gsap.quickTo(imgWrap.current, "y", { duration: 0.4, ease: "power3.out" });
+    const scaleTo = gsap.quickTo(imgWrap.current, "scale", { duration: 0.3, ease: "back.out(1.5)" });
+
+    gsap.set(imgWrap.current, { scale: 0, xPercent: -50, yPercent: -50 });
+
+    const handleEnter = () => scaleTo(1);
+    const handleLeave = () => scaleTo(0);
+    const handleMove = (e: MouseEvent) => {
+      const el = root.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cx = e.clientX - r.left;
+      const cy = e.clientY - r.top;
+      
+      xTo(cx);
+      yTo(cy);
+
+      const w = word.current;
+      if (w) {
+        w.style.setProperty("--mx", `${(cx / r.width) * 100}%`);
+        w.style.setProperty("--my", `${(cy / r.height) * 100}%`);
+      }
+    };
+
     const el = root.current;
-    const w = word.current;
-    if (!el || !w) return;
-    const r = el.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width) * 100;
-    const y = ((e.clientY - r.top) / r.height) * 100;
-    w.style.setProperty("--mx", `${x}%`);
-    w.style.setProperty("--my", `${y}%`);
-  };
+    if (el) {
+      el.addEventListener("mouseenter", handleEnter);
+      el.addEventListener("mouseleave", handleLeave);
+      el.addEventListener("mousemove", handleMove);
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener("mouseenter", handleEnter);
+        el.removeEventListener("mouseleave", handleLeave);
+        el.removeEventListener("mousemove", handleMove);
+      }
+    };
+  }, []);
 
   return (
     <Link
       ref={root}
       href={href}
       data-cursor={accent ? "magnet" : "link"}
-      onMouseMove={onMove}
-      className="group relative flex items-baseline justify-between gap-6 overflow-hidden border-b border-[var(--color-ink3)] px-[var(--gutter)] py-[clamp(32px,5vw,72px)]"
+      className="group relative flex items-baseline justify-between gap-6 overflow-hidden border-b border-[var(--color-ink3)] px-[var(--gutter)] py-[clamp(32px,5vw,72px)] isolate"
       style={{
         backgroundColor: accent ? "var(--color-ink2)" : "var(--color-ink)",
       }}
     >
+      <div 
+        ref={imgWrap} 
+        className="pointer-events-none absolute left-0 top-0 z-0 h-[200px] w-[300px] overflow-hidden rounded opacity-[0.25] mix-blend-screen"
+      >
+        <Image src={img} alt="" fill className="object-cover" />
+      </div>
+
       {/* amber wipe bg on hover — <200ms to respect motion contract */}
       <span
         aria-hidden
@@ -86,7 +135,7 @@ function Band({
 
       <span className="relative z-10 flex items-center gap-3 text-[var(--color-amber)] group-hover:text-[var(--color-ink)] transition-colors duration-150 self-center shrink-0">
         {accent && (
-          <span className="font-[var(--font-mono)] text-[var(--fs-eyebrow-sm)] uppercase tracking-[var(--tr-wide)]">
+          <span className="draw-underline font-[var(--font-mono)] text-[var(--fs-eyebrow-sm)] uppercase tracking-[var(--tr-wide)]">
             → apply
           </span>
         )}
