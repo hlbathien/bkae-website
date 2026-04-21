@@ -3,6 +3,11 @@ import { fileURLToPath } from "url";
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { seoPlugin } from "@payloadcms/plugin-seo";
+import { redirectsPlugin } from "@payloadcms/plugin-redirects";
+import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
+import { searchPlugin } from "@payloadcms/plugin-search";
+import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
 
 import { Users } from "./src/collections/Users";
 import { Media } from "./src/collections/Media";
@@ -49,6 +54,43 @@ export default buildConfig({
   ],
   globals: [SiteSettings, ManifestoPillars, FooterGlobal, Navigation, HomePage],
   editor: lexicalEditor(),
+  plugins: [
+    seoPlugin({
+      collections: ["projects", "posts", "events", "pages", "members"],
+      uploadsCollection: "media",
+      generateTitle: ({ doc }) =>
+        `${(doc as { title?: string })?.title ?? "Untitled"} — Agentic Engineering`,
+      generateURL: ({ doc, collectionSlug }) => {
+        const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+        const slug = (doc as { slug?: string })?.slug ?? "";
+        const map: Record<string, string> = {
+          projects: "/projects",
+          posts: "/journal",
+          events: "/events",
+          pages: "",
+          members: "/about/members",
+        };
+        const key = collectionSlug ?? "";
+        return `${base}${map[key] ?? ""}/${slug}`;
+      },
+    }),
+    redirectsPlugin({ collections: ["projects", "posts", "events", "pages"] }),
+    formBuilderPlugin({
+      fields: { text: true, textarea: true, select: true, email: true, checkbox: true, message: true },
+      formOverrides: { slug: "forms" },
+      formSubmissionOverrides: { slug: "form-submissions" },
+    }),
+    searchPlugin({
+      collections: ["projects", "posts", "events", "members"],
+      defaultPriorities: { projects: 30, posts: 20, events: 15, members: 10 },
+    }),
+    nestedDocsPlugin({
+      collections: ["pages"],
+      generateLabel: (_, doc) => (doc as { title?: string })?.title ?? "",
+      generateURL: (docs) =>
+        docs.reduce((url, d) => `${url}/${(d as { slug?: string }).slug ?? ""}`, ""),
+    }),
+  ],
   secret: process.env.PAYLOAD_SECRET || "dev-insecure-secret",
   typescript: {
     outputFile: path.resolve(dirname, "src/payload-types.ts"),
