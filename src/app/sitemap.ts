@@ -1,50 +1,39 @@
 import type { MetadataRoute } from "next";
 import { projects, posts } from "@/lib/cms";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://inference.club";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inference.club";
 
-  const staticRoutes = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 1 },
-    {
-      url: `${baseUrl}/projects`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/journal`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/manifesto`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/join`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    },
+export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
+  const mk = (
+    path: string,
+    priority = 0.6,
+    changeFrequency: "daily" | "weekly" | "monthly" | "yearly" = "monthly",
+    lastModified: Date = now,
+  ) => ({ url: `${SITE}${path}`, lastModified, changeFrequency, priority });
+
+  const staticRoutes: MetadataRoute.Sitemap = [
+    mk("", 1, "weekly"),
+    mk("/manifesto", 0.8, "monthly"),
+    mk("/projects", 0.9, "weekly"),
+    mk("/journal", 0.8, "weekly"),
+    mk("/about", 0.7, "monthly"),
+    mk("/events", 0.7, "weekly"),
+    mk("/press", 0.6, "monthly"),
+    mk("/sponsor", 0.6, "monthly"),
+    mk("/uses", 0.5, "monthly"),
+    mk("/changelog", 0.5, "weekly"),
+    mk("/join", 0.9, "monthly"),
+    mk("/search", 0.3, "monthly"),
   ];
 
-  const projectRoutes = projects.map((p) => ({
-    url: `${baseUrl}/projects/${p.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
+  const projectRoutes = projects.map((p) => mk(`/projects/${p.slug}`, 0.8, "monthly"));
+  const postRoutes = posts.map((p) =>
+    mk(`/journal/${p.slug}`, 0.6, "yearly", new Date(p.publishedAt)),
+  );
 
-  const postRoutes = posts.map((p) => ({
-    url: `${baseUrl}/journal/${p.slug}`,
-    lastModified: new Date(p.publishedAt),
-    changeFrequency: "yearly" as const,
-    priority: 0.5,
-  }));
+  const categories = Array.from(new Set(posts.map((p) => p.category.toLowerCase())));
+  const tagRoutes = categories.map((c) => mk(`/journal/tag/${c}`, 0.4, "monthly"));
 
-  return [...staticRoutes, ...projectRoutes, ...postRoutes];
+  return [...staticRoutes, ...projectRoutes, ...postRoutes, ...tagRoutes];
 }

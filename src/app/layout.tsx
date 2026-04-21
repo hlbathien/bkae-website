@@ -12,6 +12,7 @@ import PageTransition from "@/components/chrome/PageTransition";
 import AudioToggle from "@/components/chrome/AudioToggle";
 import LiveFavicon from "@/components/chrome/LiveFavicon";
 import DraftBanner from "@/components/chrome/DraftBanner";
+import { LD, organizationLD, websiteLD } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inference.club"),
@@ -66,6 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased">
+        <LD data={organizationLD()} />
+        <LD data={websiteLD()} />
         <DraftBanner />
         <noscript>
           <div
