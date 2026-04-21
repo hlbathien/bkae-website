@@ -196,7 +196,7 @@ export default function Footer() {
           ref={word}
           className="font-display leading-[0.85] text-center flex flex-col transition-all duration-1000 ease-[var(--ease-out-expo)]"
           style={{ 
-            fontSize: "clamp(50px, 14vw, 220px)", 
+            fontSize: "clamp(42px, 11.5vw, 220px)", 
             marginBottom: "-0.3em", 
             letterSpacing: "var(--tr-display-tight)",
             flexDirection: verticalMode ? "column" : "column",
@@ -204,8 +204,12 @@ export default function Footer() {
             transform: verticalMode ? "scale(0.4)" : "scale(1)"
           }}
         >
-          <span className="flex justify-center flex-wrap">{word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
-          <span className="flex justify-center flex-wrap">{word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}</span>
+          <span className="flex justify-center whitespace-nowrap">
+            {word1.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}
+          </span>
+          <span className="flex justify-center whitespace-nowrap">
+            {word2.map((c, i) => <span key={i} className="foot-char inline-block">{c}</span>)}
+          </span>
         </h2>
         <div
           dangerouslySetInnerHTML={{

@@ -22,6 +22,7 @@
 
 :root {
   color-scheme: dark;
+  --marquee-height: 0px;
 
   /* Horizontal gutter (unchanged) */
   --gutter: clamp(20px, 5vw, 96px);

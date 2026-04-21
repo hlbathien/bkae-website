@@ -40,7 +40,7 @@ export default function Header() {
         ref={ref}
         className={cn(
           "fixed left-0 right-0 z-40 transition-all duration-300",
-          shrunk ? "top-0" : "top-[60px]",
+          shrunk ? "top-[var(--marquee-height)]" : "top-[calc(var(--marquee-height)+24px)]",
           shrunk
             ? overManifesto
               ? "h-14 bg-[rgba(245,240,232,0.9)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import RevealText from "@/components/motion/RevealText";
 import MarqueeRow from "@/components/motion/MarqueeRow";
@@ -20,24 +20,6 @@ const HeroBlob = dynamic(() => import("@/components/motion/HeroBlob"), {
 
 const KEYWORDS =
   "VIBE CODING · DETERMINISTIC · BOUNDED · SHIP · MEASURE · TRACEABLE · REFUSABLE · ";
-
-function LiveClock() {
-  const [t, setT] = useState<string>("ICT —:—:—");
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      timeZone: "Asia/Ho_Chi_Minh",
-      hour12: false,
-    });
-    const tick = () => setT(`ICT ${fmt.format(new Date())}`);
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return <span suppressHydrationWarning>{t}</span>;
-}
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
@@ -205,10 +187,7 @@ export default function Hero() {
           </MagneticBtn>
         </div>
 
-        {/* Live build band */}
-        <div className="mt-10 font-[var(--font-mono)] text-[var(--fs-eyebrow-sm)] normal-case tracking-normal text-[var(--color-steel)]">
-          <LiveClock /> · v1.0.0-{process.env.NEXT_PUBLIC_BUILD_SHA || "dev"} · online · HCMUT
-        </div>
+        {/* Live build band removed per user request */}
 
         <div className="mt-14">
           <Link

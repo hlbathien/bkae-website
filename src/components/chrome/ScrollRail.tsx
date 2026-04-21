@@ -77,28 +77,46 @@ export default function ScrollRail() {
         setHistory([]);
       }
 
-      const scrollY = window.scrollY;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const p = scrollHeight > 0 ? scrollY / scrollHeight : 0;
-
-      if (Math.abs(p - lastProgress) > 0.001) {
-        lastProgress = p;
-        setProgress(p);
-      }
-
       if (markers.length === 0) {
         if (lastActive !== 0) {
           lastActive = 0;
           setActive(0);
           setHistory([]);
         }
+        if (lastProgress !== 0) {
+          lastProgress = 0;
+          setProgress(0);
+        }
         return;
       }
 
+      // Per-segment progress: position along rail = (activeIdx + intra) / (n-1)
       const mid = window.innerHeight / 2;
+      const tops = markers.map((m) => m.el.getBoundingClientRect().top);
+
       let current = 0;
       for (let i = 0; i < markers.length; i++) {
-        if (markers[i].el.getBoundingClientRect().top <= mid) current = i;
+        if (tops[i] <= mid) current = i;
+      }
+
+      let intra = 0;
+      if (current < markers.length - 1) {
+        const span = tops[current + 1] - tops[current];
+        if (span > 0) intra = Math.min(1, Math.max(0, (mid - tops[current]) / span));
+      } else {
+        // Last section: progress within section based on remaining doc scroll
+        const docEnd = document.documentElement.scrollHeight - window.innerHeight;
+        const remaining = docEnd - window.scrollY;
+        const lastSpan = window.innerHeight; // approximate
+        intra = lastSpan > 0 ? Math.min(1, Math.max(0, 1 - remaining / lastSpan)) : 1;
+      }
+
+      const denom = Math.max(1, markers.length - 1);
+      const p = (current + intra) / denom;
+
+      if (Math.abs(p - lastProgress) > 0.001) {
+        lastProgress = p;
+        setProgress(p);
       }
 
       if (current !== lastActive) {
@@ -124,14 +142,14 @@ export default function ScrollRail() {
       className="fixed top-1/2 z-30 hidden -translate-y-1/2 lg:block"
       style={{ left: "max(20px, calc(var(--gutter) * 0.35))" }}
     >
-      <div className="relative flex h-[60vh] flex-col items-start w-8">
-        <div className="absolute left-[5px] top-0 h-full w-px bg-[var(--color-ink3)]" />
+      <div className="relative flex h-[60vh] w-6 flex-col items-center">
+        <div className="absolute left-1/2 top-3 bottom-3 w-px -translate-x-1/2 bg-[var(--color-ink3)]" />
         <div
-          className="absolute left-[5px] top-0 w-px bg-[var(--color-amber)]"
-          style={{ height: `${progress * 100}%` }}
+          className="absolute left-1/2 top-3 w-px -translate-x-1/2 bg-[var(--color-amber)]"
+          style={{ height: `calc((100% - 24px) * ${progress})` }}
         />
         {sections.length > 0 && (
-          <ul className="relative flex h-full flex-col justify-between w-full pointer-events-auto">
+          <ul className="relative flex h-full w-full flex-col justify-between pointer-events-auto">
             {sections.map((s, i) => {
               const isActive = i === active;
               const trailIndex = history.indexOf(i);
@@ -153,12 +171,12 @@ export default function ScrollRail() {
               }
 
               return (
-                <li key={s.id} className="group relative flex items-center">
+                <li key={s.id} className="group relative flex h-6 items-center justify-center">
                   <button
                     data-cursor="link"
                     aria-label={`Scroll to ${s.label}`}
                     aria-current={isActive ? "true" : undefined}
-                    className="flex h-6 w-6 items-center justify-start focus:outline-none -ml-[7px]"
+                    className="flex h-6 w-6 items-center justify-center focus:outline-none"
                     onClick={() => {
                         window.__lenis?.scrollTo(`[data-section="${s.id}"]`);
                     }}
@@ -167,7 +185,7 @@ export default function ScrollRail() {
                       className={`block h-[11px] w-[11px] rounded-full border transition-all duration-[800ms] ${scale} ${color}`}
                     />
                   </button>
-                  <span className="pointer-events-none absolute left-6 -translate-x-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 font-[var(--font-mono)] text-[10px] uppercase tracking-[0.1em] text-[var(--color-amber)] whitespace-nowrap bg-[rgba(12,12,9,0.9)] backdrop-blur-md px-2 py-1 border border-[var(--color-ink3)] rounded drop-shadow-md">
+                  <span className="pointer-events-none absolute left-7 -translate-x-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 whitespace-nowrap rounded border border-[var(--color-ink3)] bg-[rgba(12,12,9,0.9)] px-2 py-1 font-[var(--font-mono)] text-[10px] uppercase tracking-[0.1em] text-[var(--color-amber)] drop-shadow-md backdrop-blur-md">
                     {String(i + 1).padStart(2, "0")} · {s.label}
                   </span>
                 </li>
