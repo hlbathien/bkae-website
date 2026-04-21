@@ -439,3 +439,94 @@ input:focus, textarea:focus, select:focus {
   filter: invert(1) hue-rotate(180deg);
   background: var(--color-ivory);
 }
+
+/* ─── v2 · phase 30 — view-transitions + kinetic + print ───────────── */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+::view-transition-old(root) {
+  animation-name: vt-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-in;
+}
+
+@keyframes vt-out {
+  to { opacity: 0; transform: translateY(-6px); filter: blur(2px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+}
+
+/* Shared-element morph for project cover → detail hero */
+.vt-project-cover { view-transition-name: project-cover; }
+.vt-project-hero  { view-transition-name: project-cover; }
+
+/* Scroll-linked kinetic title — scrub letter-spacing + scale on vertical scroll
+   Progressive enhancement: only fires where supported. */
+@supports (animation-timeline: scroll()) {
+  .kinetic-title {
+    animation: kinetic-type linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 40%;
+  }
+  @keyframes kinetic-type {
+    from { letter-spacing: -0.04em; transform: scale(0.98); }
+    to   { letter-spacing: 0.02em;  transform: scale(1); }
+  }
+}
+
+/* Contextual cursor v3 states — extension of SoT §15.1.
+   Handled by Cursor.tsx; data-cursor tokens declared in TS. This stylesheet
+   only reserves hover focus behavior for states we added. */
+[data-cursor="download"]:hover,
+[data-cursor="search"]:hover,
+[data-cursor="submit"]:hover,
+[data-cursor="audio"]:hover,
+[data-cursor="pin"]:hover,
+[data-cursor="timeline"]:hover,
+[data-cursor="expand"]:hover {
+  cursor: none;
+}
+
+/* Reduced motion — disable view transitions + kinetic scrubs entirely */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+  .kinetic-title {
+    animation: none !important;
+  }
+}
+
+/* Print stylesheet — sponsor-handoff one-pager for /projects/[slug] */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    background: #fff !important;
+    color: #0c0c09 !important;
+  }
+  [data-print="hide"],
+  header, footer,
+  .marquee-bar, .grid-overlay,
+  [data-chrome] {
+    display: none !important;
+  }
+  a { color: inherit !important; text-decoration: none !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 10px; color: #666; }
+  .font-display { letter-spacing: -0.02em !important; }
+  main { padding: 0 !important; }
+  section { break-inside: avoid; }
+  .eyebrow { color: #D4870A !important; }
+}
