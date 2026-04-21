@@ -1,0 +1,64 @@
+/* Inference admin — amber + ink theme override */
+
+:root[data-theme="dark"],
+:root {
+  --theme-bg: #0C0C09;
+  --theme-elevation-0: #0C0C09;
+  --theme-elevation-50: #141410;
+  --theme-elevation-100: #1A1A15;
+  --theme-elevation-150: #1F1F19;
+  --theme-elevation-200: #232320;
+  --theme-elevation-250: #282820;
+  --theme-elevation-300: #2e2e26;
+  --theme-elevation-400: #3a3a32;
+  --theme-elevation-500: #4a4a40;
+  --theme-elevation-600: #60605a;
+  --theme-elevation-700: #7A8490;
+  --theme-elevation-800: #B2BBC4;
+  --theme-elevation-900: #EDE8DC;
+  --theme-elevation-1000: #F5F0E8;
+
+  --theme-text: #F5F0E8;
+  --theme-border-color: #282820;
+  --theme-input-bg: #141410;
+
+  --color-base-0: #0C0C09;
+  --color-base-100: #F5F0E8;
+
+  --color-success-500: #D4870A;
+  --color-warning-500: #F0A020;
+  --color-error-500: #ef4444;
+
+  --theme-success-500: #D4870A;
+  --theme-warning-500: #F0A020;
+
+  --brand: #D4870A;
+  --color-brand: #D4870A;
+}
+
+.nav__logo svg,
+.logo svg {
+  color: #D4870A;
+}
+
+.btn--style-primary {
+  background: #D4870A !important;
+  color: #0C0C09 !important;
+  border-color: #D4870A !important;
+}
+
+.btn--style-primary:hover {
+  background: #F0A020 !important;
+  border-color: #F0A020 !important;
+}
+
+.dashboard {
+  background: #0C0C09;
+}
+
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #D4870A !important;
+  outline-offset: 2px !important;
+}

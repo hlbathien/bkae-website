@@ -40,6 +40,20 @@ export default buildConfig({
         Icon: "@/admin/Icon",
       },
     },
+    livePreview: {
+      url: ({ data, collectionConfig }) => {
+        const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+        const secret = process.env.PREVIEW_SECRET ?? "";
+        const slug = (data as { slug?: string })?.slug ?? "";
+        const cSlug = collectionConfig?.slug ?? "";
+        return `${base}/api/preview?secret=${secret}&collection=${cSlug}&slug=${slug}`;
+      },
+      breakpoints: [
+        { name: "mobile", label: "Mobile", width: 375, height: 667 },
+        { name: "tablet", label: "Tablet", width: 768, height: 1024 },
+        { name: "desktop", label: "Desktop", width: 1440, height: 900 },
+      ],
+    },
   },
   collections: [
     Users,
