@@ -11,6 +11,7 @@ import ScrollRail from "@/components/chrome/ScrollRail";
 import PageTransition from "@/components/chrome/PageTransition";
 import AudioToggle from "@/components/chrome/AudioToggle";
 import LiveFavicon from "@/components/chrome/LiveFavicon";
+import DraftBanner from "@/components/chrome/DraftBanner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inference.club"),
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased">
+        <DraftBanner />
         <noscript>
           <div
             style={{
