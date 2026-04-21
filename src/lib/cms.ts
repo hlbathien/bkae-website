@@ -1,5 +1,10 @@
 // Mock CMS layer. Swap with Payload calls later.
 // Each function returns shape matching planned Payload collections.
+//
+// v2 (phase 24): Payload-backed async fetchers added below as `fetch*()`.
+// Existing synchronous arrays remain unchanged to avoid breaking routes until
+// each page is migrated. Migrate one route at a time by importing the async
+// variant (e.g. `fetchProjects()`) in place of the constant.
 
 export type Project = {
   slug: string;
