@@ -66,6 +66,7 @@ Loaded via `@import` in `globals.css`. Helpers: `.font-display`, `.font-serif-it
 
 ## 5. Information Architecture
 
+### v1 (shipped)
 ```
 /                       Landing
 /projects               Index
@@ -76,7 +77,32 @@ Loaded via `@import` in `globals.css`. Helpers: `.font-display`, `.font-serif-it
 /join                   Application form
 ```
 
-No other routes in v1.
+### v2 (phases 19–30 — Payload-backed)
+```
+/about                              Team + timeline
+/about/members/[slug]               Member profile
+/events                             Workshops / talks index
+/events/[slug]                      Event detail
+/workshops                          Curricula / syllabi
+/press                              Press kit
+/sponsor                            Sponsorship tiers
+/uses                               Stack / tools
+/changelog                          Site changelog
+/journal/tag/[slug]                 Tag archive
+/search                             Global search
+/admin/[[...segments]]              Payload admin panel
+/api/[...slug]                      Payload REST
+/api/graphql, /api/graphql-playground
+/api/og                             Dynamic OG via next/og (edge)
+/api/preview                        Draft-preview enable
+/api/rss                            Journal RSS
+/api/revalidate                     Manual revalidate hook
+/llms.txt                           Markdown index for LLM crawlers
+/llms-full.txt                      Full content bundle for LLM ingestion
+/humans.txt                         Credits
+/.well-known/security.txt
+/.well-known/ai.txt
+```
 
 ## 6. Tech Stack (locked)
 
@@ -105,15 +131,49 @@ src/
     projects/[slug]/page.tsx
     journal/page.tsx
     journal/[slug]/page.tsx
+    journal/tag/[slug]/page.tsx      # v2
     manifesto/page.tsx
     join/page.tsx
+    about/page.tsx                   # v2
+    about/members/[slug]/page.tsx    # v2
+    events/page.tsx                  # v2
+    events/[slug]/page.tsx           # v2
+    workshops/page.tsx               # v2
+    press/page.tsx                   # v2
+    sponsor/page.tsx                 # v2
+    uses/page.tsx                    # v2
+    changelog/page.tsx               # v2
+    search/page.tsx                  # v2
+    (payload)/admin/[[...segments]]/page.tsx    # v2 — Payload admin
+    (payload)/api/[...slug]/route.ts            # v2 — Payload REST
+    (payload)/api/graphql/route.ts              # v2
+    (payload)/api/graphql-playground/route.ts   # v2
+    api/join/route.ts
+    api/og/route.ts                  # v2 — dynamic OG (edge)
+    api/preview/route.ts             # v2
+    api/rss/route.ts                 # v2
+    api/revalidate/route.ts          # v2
+    llms.txt/route.ts                # v2
+    llms-full.txt/route.ts           # v2
+    humans.txt/route.ts              # v2
+    .well-known/security.txt/route.ts# v2
+    .well-known/ai.txt/route.ts      # v2
   components/
     chrome/    SmoothScroll, Header, MarqueeBar, GridOverlay, Cursor, Footer
     motion/    RevealText, CountUp, MagneticBtn, MarqueeRow
     primitives/ Frame, Tag, Button
     sections/  Hero, Manifesto, Projects, Process, Stats, JournalPreview, CTABands
   lib/        cms.ts, gsap.ts, fonts.ts, utils.ts
-docs/         this file + others
+  collections/   # v2 — Payload collection configs
+  globals/       # v2 — Payload globals
+  blocks/        # v2 — page-builder + lexical blocks
+  access/        # v2 — access-control helpers
+  hooks/         # v2 — afterChange revalidate, readingTime calc
+  admin/         # v2 — admin UI overrides (Logo, Icon, Dashboard, SCSS)
+  payload-types.ts  # v2 — generated
+payload.config.ts    # v2 (repo root)
+docker-compose.yml   # v2 (repo root)
+docs/           this file + others
 ```
 
 New top-level dirs require update to this file.
@@ -323,6 +383,28 @@ Added to locked stack:
 - `ogl` (~6 KB gz) — WebGL micro-lib for hero distortion field. Lazy-loaded via `next/dynamic`, SSR off.
 
 Previously forbidden `three.js` remains forbidden. `ogl` is explicitly carved out.
+
+### v2 (phase 19 — approved)
+
+Runtime:
+- `payload` — CMS core
+- `@payloadcms/next` — Next.js App Router adapter
+- `@payloadcms/db-postgres` — Postgres DB adapter
+- `@payloadcms/richtext-lexical` — lexical rich-text editor
+- `@payloadcms/plugin-seo` — per-doc SEO fields
+- `@payloadcms/plugin-redirects` — editor-managed 301/302
+- `@payloadcms/plugin-form-builder` — backs `/join`
+- `@payloadcms/plugin-search` — search index collection
+- `@payloadcms/plugin-nested-docs` — parent/child for pages
+- `@payloadcms/plugin-cloud-storage` + `@payloadcms/storage-s3` — Supabase Storage (S3-compat)
+- `graphql` — peer dep for Payload GraphQL
+
+Dev:
+- `@payloadcms/eslint-config`
+- `cross-env`
+- `tsx`
+
+Payload admin code is isolated under `src/app/(payload)/admin` route segment; public route bundle budget (SoT §11) still applies.
 
 ## 18. Out-of-scope guardrail
 

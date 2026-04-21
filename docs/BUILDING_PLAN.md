@@ -246,6 +246,103 @@ Capture 5 screenshots, 1 ≤ 60s screen-record (Playwright video), accessibility
 | 15  | Page transition       | 16     |
 | 16  | Micro-int audit       | 17     |
 | 17  | Motion QA + perf      | 18     |
-| 18  | Award package         | —      |
+| 18  | Award package         | 19     |
+
+---
+
+## v2 — Payload CMS + AI-native + SOTA upgrade
+
+Human-approved deps + scope (see SoT §17, §7). One commit per phase.
+
+## Phase 19 — Deps + SoT update
+
+Install Payload v3 runtime deps (see SoT §17 v2 list). Update SoT §5, §7, §17. Verify `pnpm tsc --noEmit` and `pnpm next build` still pass with deps installed but unused.
+
+**Acceptance:** tsc 0, build 0, deps in `package.json`, SoT updated.
+
+## Phase 20 — Docker Postgres
+
+Add `docker-compose.yml` (postgres:16-alpine + adminer). Add DATABASE_URI/PAYLOAD_SECRET/PREVIEW_SECRET/NEXT_PUBLIC_SITE_URL/S3_* placeholders to `.env.example`. Healthcheck passes.
+
+**Acceptance:** `docker compose up -d` → `pg_isready` ok; `.env.example` has all keys.
+
+## Phase 21 — Payload bootstrap
+
+`payload.config.ts` at root. `src/app/(payload)/admin/[[...segments]]/page.tsx` + `(payload)/api/[...slug]/route.ts` + graphql routes. `withPayload` wrap in `next.config.ts`. Empty `users` collection. `/admin` returns 200 and serves first-boot flow.
+
+**Acceptance:** `/admin` 200, first admin user creatable, tsc 0, build 0.
+
+## Phase 22 — Collections + globals
+
+`src/collections/*` (projects, posts, events, members, announcements, pages, media, tags, redirects, users) + `src/globals/*` (site-settings, manifesto-pillars, footer, navigation, home-page). Versions+drafts+autosave on content collections. `pnpm payload generate:types` → `src/payload-types.ts`.
+
+**Acceptance:** types compile; all collections visible in admin nav.
+
+## Phase 23 — Migrations + seed
+
+`pnpm payload migrate`. Seed script (`scripts/seed.mjs`) ports `src/lib/cms.ts` fixtures into DB.
+
+**Acceptance:** counts match fixtures; admin shows seeded docs.
+
+## Phase 24 — cms.ts facade swap
+
+Rewrite `src/lib/cms.ts` as Payload-backed facade; keep exported signatures byte-compatible. Public routes unchanged visually.
+
+**Acceptance:** tsc 0, build 0, route screenshots identical.
+
+## Phase 25 — SEO + dynamic OG
+
+`plugin-seo` per collection. `src/app/api/og/route.ts` (edge) using `next/og` with amber-on-ink template. `generateMetadata` in dynamic routes hydrated from Payload SEO fields + default OG.
+
+**Acceptance:** Lighthouse SEO ≥ 98 per route; `/api/og?title=X` returns 1200×630 PNG.
+
+## Phase 26 — Revalidation + draft preview
+
+`afterChange` hook per collection → `revalidateTag` + `revalidatePath`. `/api/preview` toggles draftMode. Admin `livePreview.url` wired. Draft banner component + `Esc` exit.
+
+**Acceptance:** edit → published in ≤ 1s on public route; preview banner renders only in draftMode.
+
+## Phase 27 — Admin UI re-skin
+
+`src/admin/{Logo,Icon,Dashboard}.tsx` + `custom.scss`. Dark amber theme. Dashboard widgets: drafts, scheduled, recent submissions, broken-links, sparkline published/week, quick-action row.
+
+**Acceptance:** `/admin` visually matches brand tokens; widgets render live data.
+
+## Phase 28 — New public routes
+
+`/about`, `/about/members/[slug]`, `/events`, `/events/[slug]`, `/workshops`, `/press`, `/sponsor`, `/uses`, `/changelog`, `/search`, `/journal/tag/[slug]`. Each fetches Payload data; `generateStaticParams` + `generateMetadata` where dynamic.
+
+**Acceptance:** tsc 0, build 0, every route 200 in dev; mobile layout clean at 320/768/1280.
+
+## Phase 29 — AI-native surfaces
+
+Rewrite `src/app/robots.ts` (allow GPTBot/ClaudeBot/ChatGPT-User/PerplexityBot/Google-Extended/Applebot-Extended; disallow CCBot/Bytespider/ImagesiftBot/Amazonbot/anthropic-ai). Add `/llms.txt`, `/llms-full.txt`, `/humans.txt`, `/.well-known/security.txt`, `/.well-known/ai.txt`, `/api/rss`. Emit JSON-LD (`Organization`, `WebSite`, `BreadcrumbList`, `Article`, `CreativeWork`, `Person`, `Event`) per route.
+
+**Acceptance:** all endpoints 200; JSON-LD validates via `schema.org` linter; RSS parses.
+
+## Phase 30 — Motion + UX upgrades + final perf
+
+Loader v3, `view-transition-api` route transitions, cursor v3 states (`audio, search, download, submit, pin, timeline, expand`), kinetic type scrubs tightened, magnetic snap on project covers, print stylesheet for `/projects/[slug]`. Re-run Lighthouse all routes.
+
+**Acceptance:** landing JS ≤ 220 KB gz; mobile perf ≥ 90, a11y ≥ 95, SEO ≥ 98 all routes.
+
+---
+
+## v2 phase index
+
+| #   | Name                          | Blocks |
+| --- | ----------------------------- | ------ |
+| 19  | Deps + SoT                    | 20     |
+| 20  | Docker Postgres               | 21     |
+| 21  | Payload bootstrap             | 22     |
+| 22  | Collections + globals         | 23     |
+| 23  | Migrations + seed             | 24     |
+| 24  | cms.ts facade swap            | 25     |
+| 25  | SEO + dynamic OG              | 26     |
+| 26  | Revalidation + draft preview  | 27     |
+| 27  | Admin UI re-skin              | 28     |
+| 28  | New public routes             | 29     |
+| 29  | AI-native surfaces            | 30     |
+| 30  | Motion + UX + final perf      | —      |
 
 Agent must commit at end of each phase. One commit per phase. Message: `phase(N): <slug> — <one-line summary>`.
