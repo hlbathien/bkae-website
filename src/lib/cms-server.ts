@@ -18,7 +18,9 @@ async function getClient(): Promise<PayloadShape | null> {
     const { getPayload } = await import("payload");
     const config = (await import("@payload-config")).default;
     return (await getPayload({ config })) as unknown as PayloadShape;
-  } catch {
+  } catch (err) {
+    // Don't silently swallow — ops must see that the DB fell back to mock.
+    console.error("[cms-server] Payload client init failed, falling back to mock:", err);
     return null;
   }
 }

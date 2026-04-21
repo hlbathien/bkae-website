@@ -43,8 +43,10 @@ export const articleLD = (p: {
   slug: string;
   excerpt: string;
   publishedAt: string;
+  modifiedAt?: string;
   category: string;
   author?: string;
+  image?: string;
 }) => ({
   "@context": "https://schema.org",
   "@type": "Article",
@@ -53,6 +55,8 @@ export const articleLD = (p: {
   articleSection: p.category,
   url: `${SITE}/journal/${p.slug}`,
   datePublished: p.publishedAt,
+  dateModified: p.modifiedAt ?? p.publishedAt,
+  image: p.image ?? `${SITE}/api/og?title=${encodeURIComponent(p.title)}&kind=journal`,
   author: { "@type": "Person", name: p.author ?? "Agentic Engineering" },
   publisher: organizationLD(),
 });
@@ -68,7 +72,7 @@ export const creativeWorkLD = (p: {
   name: p.title,
   description: p.problem,
   url: `${SITE}/projects/${p.slug}`,
-  programmingLanguage: p.stack,
+  programmingLanguage: p.stack.join(", "),
   creator: organizationLD(),
 });
 
@@ -82,11 +86,26 @@ export const personLD = (m: { name: string; slug: string; role: string; bio: str
   affiliation: organizationLD(),
 });
 
+// Escape characters that would break out of a <script> tag or JS string.
+// U+2028/U+2029 are invisible line terminators valid in JSON but illegal
+// as raw JS source, so we escape via their hex code points.
+const LS = " ";
+const PS = " ";
+
+function safeJson(data: unknown): string {
+  return JSON.stringify(data)
+    .split("<").join("\\u003c")
+    .split(">").join("\\u003e")
+    .split("&").join("\\u0026")
+    .split(LS).join("\\u2028")
+    .split(PS).join("\\u2029");
+}
+
 export function LD({ data }: { data: unknown }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJson(data) }}
     />
   );
 }

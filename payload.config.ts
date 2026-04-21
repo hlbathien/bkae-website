@@ -4,7 +4,6 @@ import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { seoPlugin } from "@payloadcms/plugin-seo";
-import { redirectsPlugin } from "@payloadcms/plugin-redirects";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 import { searchPlugin } from "@payloadcms/plugin-search";
 import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
@@ -88,7 +87,10 @@ export default buildConfig({
         return `${base}${map[key] ?? ""}/${slug}`;
       },
     }),
-    redirectsPlugin({ collections: ["projects", "posts", "events", "pages"] }),
+    // NOTE: redirectsPlugin is intentionally NOT registered in v2 — its
+    // middleware integration must be wired in src/middleware.ts before the
+    // `redirects` collection will actually redirect. Re-enable only after
+    // wiring the middleware (tracked in a future phase).
     formBuilderPlugin({
       fields: { text: true, textarea: true, select: true, email: true, checkbox: true, message: true },
       formOverrides: { slug: "forms" },
@@ -105,7 +107,20 @@ export default buildConfig({
         docs.reduce((url, d) => `${url}/${(d as { slug?: string }).slug ?? ""}`, ""),
     }),
   ],
-  secret: process.env.PAYLOAD_SECRET || "dev-insecure-secret",
+  secret: (() => {
+    const s = process.env.PAYLOAD_SECRET;
+    if (s && s !== "__generate_with_openssl_rand_base64_32__") return s;
+    // During `next build` Payload config is imported for route collection;
+    // env may legitimately be absent in CI. Only hard-fail at actual runtime
+    // (NEXT_PHASE not set, or phase != build).
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return "build-time-placeholder-no-runtime-use";
+    }
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("PAYLOAD_SECRET missing or placeholder in production");
+    }
+    return "dev-insecure-secret-do-not-use-in-prod";
+  })(),
   typescript: {
     outputFile: path.resolve(dirname, "src/payload-types.ts"),
   },

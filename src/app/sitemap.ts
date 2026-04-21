@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
-import { projects, posts } from "@/lib/cms";
+import { fetchPosts, fetchProjects } from "@/lib/cms-server";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inference.club";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const enc = (s: string) => s.split("/").map(encodeURIComponent).join("/");
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const mk = (
     path: string,
@@ -27,13 +29,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     mk("/search", 0.3, "monthly"),
   ];
 
-  const projectRoutes = projects.map((p) => mk(`/projects/${p.slug}`, 0.8, "monthly"));
+  const [projects, posts] = await Promise.all([fetchProjects(), fetchPosts()]);
+
+  const projectRoutes = projects.map((p) =>
+    mk(`/projects/${enc(p.slug)}`, 0.8, "monthly"),
+  );
   const postRoutes = posts.map((p) =>
-    mk(`/journal/${p.slug}`, 0.6, "yearly", new Date(p.publishedAt)),
+    mk(`/journal/${enc(p.slug)}`, 0.6, "yearly", new Date(p.publishedAt)),
   );
 
-  const categories = Array.from(new Set(posts.map((p) => p.category.toLowerCase())));
-  const tagRoutes = categories.map((c) => mk(`/journal/tag/${c}`, 0.4, "monthly"));
+  const categories = Array.from(
+    new Set(posts.map((p) => p.category.toLowerCase())),
+  );
+  const tagRoutes = categories.map((c) =>
+    mk(`/journal/tag/${encodeURIComponent(c)}`, 0.4, "monthly"),
+  );
 
   return [...staticRoutes, ...projectRoutes, ...postRoutes, ...tagRoutes];
 }

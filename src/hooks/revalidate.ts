@@ -7,10 +7,17 @@ const make =
   (collection: string, basePath: string): CollectionAfterChangeHook =>
   ({ doc, previousDoc }) => {
     revalidateTag(tagFor(collection), "max");
-    if (doc?.slug) revalidatePath(`${basePath}/${doc.slug}`, "page");
-    revalidatePath(basePath, "page");
-    if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
-      revalidatePath(`${basePath}/${previousDoc.slug}`, "page");
+    if (basePath) {
+      revalidatePath(basePath, "page");
+      if (doc?.slug) revalidatePath(`${basePath}/${doc.slug}`, "page");
+      if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
+        revalidatePath(`${basePath}/${previousDoc.slug}`, "page");
+      }
+    } else {
+      // Pages without base path: re-render root layout so any page can pick
+      // up updated data (nav, footer, etc.).
+      revalidatePath("/", "layout");
+      if (doc?.slug) revalidatePath(`/${doc.slug}`, "page");
     }
     return doc;
   };

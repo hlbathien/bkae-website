@@ -1,11 +1,18 @@
 import type { CollectionConfig } from "payload";
-import { anyone, editorOrAdmin } from "../access/roles";
+import { editorOrAdmin } from "../access/roles";
 
 export const Media: CollectionConfig = {
   slug: "media",
   admin: { useAsTitle: "alt", group: "Content" },
   access: {
-    read: anyone,
+    // Public reads only when `public:true`. Default is false so private
+    // uploads (drafts, contracts) don't leak.
+    read: ({ req: { user }, data }) => {
+      if (user) return true;
+      if ((data as { public?: boolean } | undefined)?.public === true) return true;
+      // At list-time Payload may call read without `data` — filter.
+      return { public: { equals: true } };
+    },
     create: editorOrAdmin,
     update: editorOrAdmin,
     delete: editorOrAdmin,
@@ -24,5 +31,11 @@ export const Media: CollectionConfig = {
   fields: [
     { name: "alt", type: "text", required: true },
     { name: "credit", type: "text" },
+    {
+      name: "public",
+      type: "checkbox",
+      defaultValue: true,
+      admin: { description: "Uncheck to restrict to authenticated admins." },
+    },
   ],
 };

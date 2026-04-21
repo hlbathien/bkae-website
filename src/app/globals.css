@@ -517,10 +517,14 @@ input:focus, textarea:focus, select:focus {
     background: #fff !important;
     color: #0c0c09 !important;
   }
+  /* Hide chrome. Ids/selectors target the concrete Header/Footer markup. */
   [data-print="hide"],
-  header, footer,
-  .marquee-bar, .grid-overlay,
-  [data-chrome] {
+  header, nav, footer,
+  [role="banner"],
+  [role="contentinfo"],
+  [aria-label="scroll rail"],
+  [aria-label="marquee"],
+  [aria-hidden="true"].fixed {
     display: none !important;
   }
   a { color: inherit !important; text-decoration: none !important; }
