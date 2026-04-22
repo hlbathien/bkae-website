@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const categories = Array.from(
-    new Set(posts.map((p) => p.category.toLowerCase())),
+    new Set(posts.map((p) => p.category?.toLowerCase()).filter((c): c is string => !!c)),
   );
   const tagRoutes = categories.map((c) =>
     mk(`/journal/tag/${encodeURIComponent(c)}`, 0.4, "monthly"),

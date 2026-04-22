@@ -2,10 +2,17 @@
    Run: pnpm seed  (after `docker compose up -d` and Payload first-boot)
 */
 import { getPayload } from "payload";
-import config from "../payload.config";
+import * as configMod from "../payload.config";
 
 async function main() {
-  const payload = await getPayload({ config });
+  // tsx CJS interop sometimes double-wraps default export; unwrap defensively.
+  const cfg =
+    (configMod as { default?: unknown }).default &&
+    typeof (configMod as { default?: { default?: unknown } }).default === "object" &&
+    (configMod as { default: { default?: unknown } }).default.default
+      ? (configMod as { default: { default: unknown } }).default.default
+      : (configMod as { default: unknown }).default;
+  const payload = await getPayload({ config: cfg as never });
 
   // Tags
   const stackTags = ["Qwen-VL", "Next.js", "Postgres + pgvector", "Whisper", "Inngest", "Qwen", "Pydantic", "FastAPI", "PDF.js", "Postgres"];
