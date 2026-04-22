@@ -66,6 +66,11 @@ export default buildConfig({
     Pages,
   ],
   globals: [SiteSettings, ManifestoPillars, FooterGlobal, Navigation, HomePage],
+  localization: {
+    locales: ["en"],
+    defaultLocale: "en",
+    fallback: false,
+  },
   editor: lexicalEditor(),
   plugins: [
     seoPlugin({
