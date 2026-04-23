@@ -2,6 +2,7 @@ import Frame from "@/components/primitives/Frame";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchEvents } from "@/lib/cms-server";
+import { LD, breadcrumbLD, eventLD } from "@/lib/jsonld";
 
 type EventDoc = {
   slug?: string;
@@ -25,6 +26,23 @@ export default async function EventDetail({
 
   return (
     <Frame className="pt-40 pb-24">
+      <LD
+        data={eventLD({
+          title: e.title ?? "Event",
+          slug: e.slug ?? slug,
+          startsAt: e.startsAt,
+          endsAt: e.endsAt,
+          summary: e.summary,
+          location: e.location,
+        })}
+      />
+      <LD
+        data={breadcrumbLD([
+          { name: "Home", url: "/" },
+          { name: "Events", url: "/events" },
+          { name: e.title ?? "Event", url: `/events/${e.slug ?? slug}` },
+        ])}
+      />
       <Link
         href="/events"
         className="bracket-link font-mono text-[11px] uppercase tracking-widest text-[var(--color-steel)]"

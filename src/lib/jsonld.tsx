@@ -86,6 +86,33 @@ export const personLD = (m: { name: string; slug: string; role: string; bio: str
   affiliation: organizationLD(),
 });
 
+export const eventLD = (e: {
+  title: string;
+  slug: string;
+  startsAt?: string;
+  endsAt?: string;
+  summary?: string;
+  location?: { name?: string; url?: string };
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: e.title,
+  startDate: e.startsAt,
+  endDate: e.endsAt,
+  description: e.summary,
+  url: `${SITE}/events/${e.slug}`,
+  location: e.location?.name
+    ? {
+        "@type": "Place",
+        name: e.location.name,
+        url: e.location.url,
+      }
+    : undefined,
+  organizer: organizationLD(),
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+});
+
 // Escape characters that would break out of a <script> tag or JS string.
 // U+2028/U+2029 are invisible line terminators valid in JSON but illegal
 // as raw JS source, so we escape via their hex code points.

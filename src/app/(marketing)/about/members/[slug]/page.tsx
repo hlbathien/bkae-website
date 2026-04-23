@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchMembers } from "@/lib/cms-server";
 import { members as membersMock } from "@/lib/cms";
+import { LD, breadcrumbLD, personLD } from "@/lib/jsonld";
 
 export async function generateStaticParams() {
   return membersMock.map((m) => ({ slug: m.slug }));
@@ -31,6 +32,14 @@ export default async function MemberPage({
 
   return (
     <Frame className="pt-40 pb-24">
+      <LD data={personLD({ name: m.name, slug: m.slug, role: m.role, bio: m.bio })} />
+      <LD
+        data={breadcrumbLD([
+          { name: "Home", url: "/" },
+          { name: "About", url: "/about" },
+          { name: m.name, url: `/about/members/${m.slug}` },
+        ])}
+      />
       <Link
         href="/about"
         className="bracket-link font-mono text-[11px] uppercase tracking-widest text-[var(--color-steel)]"
