@@ -23,6 +23,8 @@ import { ManifestoPillars } from "./src/globals/ManifestoPillars";
 import { FooterGlobal } from "./src/globals/Footer";
 import { Navigation } from "./src/globals/Navigation";
 import { HomePage } from "./src/globals/HomePage";
+import { StatsBoard } from "./src/globals/StatsBoard";
+import { ProcessFlow } from "./src/globals/ProcessFlow";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -38,6 +40,7 @@ export default buildConfig({
         Logo: "@/admin/Logo",
         Icon: "@/admin/Icon",
       },
+      beforeDashboard: ["@/admin/Dashboard"],
     },
     livePreview: {
       url: ({ data, collectionConfig }) => {
@@ -65,7 +68,7 @@ export default buildConfig({
     Announcements,
     Pages,
   ],
-  globals: [SiteSettings, ManifestoPillars, FooterGlobal, Navigation, HomePage],
+  globals: [SiteSettings, ManifestoPillars, FooterGlobal, Navigation, HomePage, StatsBoard, ProcessFlow],
   localization: {
     locales: ["en"],
     defaultLocale: "en",

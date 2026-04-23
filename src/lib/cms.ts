@@ -43,6 +43,30 @@ export type Announcement = {
   href: string;
 };
 
+export type Stat = {
+  value: number;
+  suffix?: string;
+  label: string;
+  sparkline?: number[];
+};
+
+export type ProcessNode = {
+  id: string;
+  label: string;
+  desc: string;
+  icon?: string;
+};
+
+export type HomePageContent = {
+  heroEyebrow: string;
+  heroHeadline: string;
+  heroSubheadline?: string;
+  heroKeywords: string[];
+  heroLiveBandSuffix: string;
+  manifestoQuote: string;
+  ctaBands: { label: string; href: string }[];
+};
+
 export const announcements: Announcement[] = [
   {
     text: "2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025",
@@ -139,17 +163,31 @@ export const members: Member[] = [
   },
 ];
 
-export const stats = [
-  { value: 2, suffix: "", label: "Hackathon placings" },
-  { value: 200, suffix: "+", label: "Teams beaten" },
-  { value: 2, suffix: "", label: "Production systems shipped" },
-  { value: 1, suffix: "", label: "Discipline being defined" },
+export const stats: Stat[] = [
+  { value: 2, suffix: "", label: "Hackathon placings", sparkline: [10, 28, 22, 40, 36, 60, 52, 78] },
+  { value: 200, suffix: "+", label: "Teams beaten", sparkline: [8, 18, 30, 28, 44, 52, 70, 88] },
+  { value: 2, suffix: "", label: "Production systems shipped", sparkline: [4, 8, 12, 18, 26, 36, 50, 70] },
+  { value: 1, suffix: "", label: "Discipline being defined", sparkline: [60, 64, 70, 72, 78, 80, 84, 90] },
 ];
 
-export const processNodes = [
-  { id: "input", label: "Input", desc: "Photos · voice · text · context" },
-  { id: "tags", label: "Tags", desc: "Pure-function classifier" },
-  { id: "writer", label: "Writer", desc: "Bounded LLM, contract I/O" },
-  { id: "memory", label: "Memory", desc: "pgvector + episodic store" },
-  { id: "output", label: "Output", desc: "Traceable, cited, refusable" },
+export const processNodes: ProcessNode[] = [
+  { id: "input", label: "Input", desc: "Photos · voice · text · context", icon: "dot" },
+  { id: "tags", label: "Tags", desc: "Pure-function classifier", icon: "tag" },
+  { id: "writer", label: "Writer", desc: "Bounded LLM, contract I/O", icon: "pen" },
+  { id: "memory", label: "Memory", desc: "pgvector + episodic store", icon: "database" },
+  { id: "output", label: "Output", desc: "Traceable, cited, refusable", icon: "send" },
 ];
+
+export const homePageMock: HomePageContent = {
+  heroEyebrow: "Agentic Engineering · HCMUT · Founded 2026",
+  heroHeadline:
+    "We don't teach AI. We institutionalize the engineering discipline AI-native software demands.",
+  heroKeywords: ["bounded", "contract-based", "shipped", "traceable"],
+  heroLiveBandSuffix: "HCMUT",
+  manifestoQuote: "Bounded models. Contract-based pipelines. Shipped systems.",
+  ctaBands: [
+    { label: "Apply to the founding cohort", href: "/join" },
+    { label: "Read the engineering journal", href: "/journal" },
+    { label: "View open-source projects", href: "/projects" },
+  ],
+};

@@ -164,8 +164,8 @@ src/
     primitives/ Frame, Tag, Button
     sections/  Hero, Manifesto, Projects, Process, Stats, JournalPreview, CTABands
   lib/        cms.ts, gsap.ts, fonts.ts, utils.ts
-  collections/   # v2 — Payload collection configs
-  globals/       # v2 — Payload globals
+  collections/   Users, Media, Tags, Members, Projects, Posts, Events, Announcements, Pages
+  globals/       SiteSettings, ManifestoPillars, Footer, Navigation, HomePage, StatsBoard, ProcessFlow
   blocks/        # v2 — page-builder + lexical blocks
   access/        # v2 — access-control helpers
   hooks/         # v2 — afterChange revalidate, readingTime calc
@@ -216,9 +216,25 @@ type Member = {
 };
 
 type Announcement = { text: string; href: string };
+
+type Stat = { value: number; suffix?: string; label: string; sparkline?: number[] };
+
+type ProcessNode = { id: string; label: string; desc: string; icon?: string };
+
+type HomePageContent = {
+  heroEyebrow: string;
+  heroHeadline: string;
+  heroSubheadline?: string;
+  heroKeywords: string[];
+  heroLiveBandSuffix: string;
+  manifestoQuote: string;
+  ctaBands: { label: string; href: string }[];
+};
 ```
 
 Required projects in v1: `lumen-journal`, `atlas-clinical`.
+
+Globals `stats-board`, `process-flow`, `home-page` back the Stats / Process / Hero+Manifesto+CTABands sections respectively. Mock fallbacks (`stats`, `processNodes`, `homePageMock`) live in `src/lib/cms.ts`. Server facade exposes `fetchStats()`, `fetchProcessNodes()`, `fetchHomePage()` in `src/lib/cms-server.ts`.
 
 ## 9. Page Contracts
 

@@ -1,15 +1,28 @@
 import "server-only";
-import type { Announcement, Member, Post, Project } from "./cms";
+import type {
+  Announcement,
+  HomePageContent,
+  Member,
+  Post,
+  ProcessNode,
+  Project,
+  Stat,
+} from "./cms";
 import {
   announcements as announcementsMock,
+  homePageMock,
   members as membersMock,
   posts as postsMock,
+  processNodes as processNodesMock,
   projects as projectsMock,
+  stats as statsMock,
 } from "./cms";
 
+type FindArgs = Record<string, unknown>;
+type GlobalArgs = { slug: string; depth?: number };
 type PayloadShape = {
-  find: (args: unknown) => Promise<{ docs: unknown[] }>;
-  findGlobal: (args: unknown) => Promise<unknown>;
+  find: (args: FindArgs) => Promise<{ docs: unknown[] }>;
+  findGlobal: (args: GlobalArgs) => Promise<unknown>;
 };
 
 async function getClient(): Promise<PayloadShape | null> {
@@ -19,18 +32,33 @@ async function getClient(): Promise<PayloadShape | null> {
     const config = (await import("@payload-config")).default;
     return (await getPayload({ config })) as unknown as PayloadShape;
   } catch (err) {
-    // Don't silently swallow — ops must see that the DB fell back to mock.
     console.error("[cms-server] Payload client init failed, falling back to mock:", err);
     return null;
   }
 }
 
+// ---- Mappers --------------------------------------------------------------
+// Payload returns Project.stack as Tag relations (with `name`) when depth>0,
+// or as ID strings when depth=0. Mock CMS contract is `string[]` of names.
+// Normalize so consumers stay shape-agnostic.
+type RawTag = string | { name?: string; slug?: string } | null | undefined;
+type RawProject = Omit<Project, "stack"> & { stack?: RawTag[] };
+
+function normalizeProject(raw: unknown): Project {
+  const p = raw as RawProject;
+  const stack = (p.stack ?? [])
+    .map((t) => (typeof t === "string" ? t : (t?.name ?? t?.slug ?? "")))
+    .filter((s): s is string => typeof s === "string" && s.length > 0);
+  return { ...(p as Project), stack };
+}
+
+// ---- Projects -------------------------------------------------------------
 export async function fetchProjects(): Promise<Project[]> {
   const p = await getClient();
   if (!p) return projectsMock;
   try {
-    const res = await p.find({ collection: "projects", limit: 50, sort: "index" });
-    return res.docs as unknown as Project[];
+    const res = await p.find({ collection: "projects", limit: 50, sort: "index", depth: 1 });
+    return res.docs.map(normalizeProject);
   } catch {
     return projectsMock;
   }
@@ -44,15 +72,15 @@ export async function fetchProject(slug: string): Promise<Project | undefined> {
       collection: "projects",
       where: { slug: { equals: slug } },
       limit: 1,
+      depth: 1,
     });
-    return (
-      (res.docs[0] as unknown as Project) ?? projectsMock.find((x) => x.slug === slug)
-    );
+    return res.docs[0] ? normalizeProject(res.docs[0]) : projectsMock.find((x) => x.slug === slug);
   } catch {
     return projectsMock.find((x) => x.slug === slug);
   }
 }
 
+// ---- Posts ----------------------------------------------------------------
 export async function fetchPosts(): Promise<Post[]> {
   const p = await getClient();
   if (!p) return postsMock;
@@ -79,6 +107,7 @@ export async function fetchPost(slug: string): Promise<Post | undefined> {
   }
 }
 
+// ---- Members --------------------------------------------------------------
 export async function fetchMembers(): Promise<Member[]> {
   const p = await getClient();
   if (!p) return membersMock;
@@ -90,6 +119,7 @@ export async function fetchMembers(): Promise<Member[]> {
   }
 }
 
+// ---- Announcements --------------------------------------------------------
 export async function fetchAnnouncements(): Promise<Announcement[]> {
   const p = await getClient();
   if (!p) return announcementsMock;
@@ -105,6 +135,7 @@ export async function fetchAnnouncements(): Promise<Announcement[]> {
   }
 }
 
+// ---- Events ---------------------------------------------------------------
 export async function fetchEvents(): Promise<unknown[]> {
   const p = await getClient();
   if (!p) return [];
@@ -113,5 +144,73 @@ export async function fetchEvents(): Promise<unknown[]> {
     return res.docs;
   } catch {
     return [];
+  }
+}
+
+// ---- Globals --------------------------------------------------------------
+type StatsBoardGlobal = {
+  items?: { label: string; value: number; suffix?: string; sparkline?: { n: number }[] }[];
+};
+type ProcessFlowGlobal = {
+  nodes?: { id: string; label: string; desc: string; icon?: string }[];
+};
+type HomePageGlobal = {
+  heroEyebrow?: string;
+  heroHeadline?: string;
+  heroSubheadline?: string;
+  heroKeywords?: { word: string }[];
+  heroLiveBandSuffix?: string;
+  manifestoQuote?: string;
+  ctaBands?: { label: string; href: string }[];
+};
+
+export async function fetchStats(): Promise<Stat[]> {
+  const p = await getClient();
+  if (!p) return statsMock;
+  try {
+    const g = (await p.findGlobal({ slug: "stats-board" })) as StatsBoardGlobal;
+    const items = g.items ?? [];
+    if (!items.length) return statsMock;
+    return items.map((it) => ({
+      value: it.value,
+      suffix: it.suffix,
+      label: it.label,
+      sparkline: (it.sparkline ?? []).map((p) => p.n),
+    }));
+  } catch {
+    return statsMock;
+  }
+}
+
+export async function fetchProcessNodes(): Promise<ProcessNode[]> {
+  const p = await getClient();
+  if (!p) return processNodesMock;
+  try {
+    const g = (await p.findGlobal({ slug: "process-flow" })) as ProcessFlowGlobal;
+    const nodes = g.nodes ?? [];
+    return nodes.length ? nodes : processNodesMock;
+  } catch {
+    return processNodesMock;
+  }
+}
+
+export async function fetchHomePage(): Promise<HomePageContent> {
+  const p = await getClient();
+  if (!p) return homePageMock;
+  try {
+    const g = (await p.findGlobal({ slug: "home-page" })) as HomePageGlobal;
+    return {
+      heroEyebrow: g.heroEyebrow ?? homePageMock.heroEyebrow,
+      heroHeadline: g.heroHeadline ?? homePageMock.heroHeadline,
+      heroSubheadline: g.heroSubheadline,
+      heroKeywords: (g.heroKeywords ?? []).map((k) => k.word).filter(Boolean).length
+        ? (g.heroKeywords ?? []).map((k) => k.word)
+        : homePageMock.heroKeywords,
+      heroLiveBandSuffix: g.heroLiveBandSuffix ?? homePageMock.heroLiveBandSuffix,
+      manifestoQuote: g.manifestoQuote ?? homePageMock.manifestoQuote,
+      ctaBands: g.ctaBands?.length ? g.ctaBands : homePageMock.ctaBands,
+    };
+  } catch {
+    return homePageMock;
   }
 }

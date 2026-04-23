@@ -137,6 +137,48 @@ async function main() {
     } as never,
   });
 
+  await payload.updateGlobal({
+    slug: "stats-board",
+    data: {
+      items: [
+        { label: "Hackathon placings", value: 2, suffix: "", sparkline: [{ n: 10 }, { n: 28 }, { n: 22 }, { n: 40 }, { n: 36 }, { n: 60 }, { n: 52 }, { n: 78 }] },
+        { label: "Teams beaten", value: 200, suffix: "+", sparkline: [{ n: 8 }, { n: 18 }, { n: 30 }, { n: 28 }, { n: 44 }, { n: 52 }, { n: 70 }, { n: 88 }] },
+        { label: "Production systems shipped", value: 2, suffix: "", sparkline: [{ n: 4 }, { n: 8 }, { n: 12 }, { n: 18 }, { n: 26 }, { n: 36 }, { n: 50 }, { n: 70 }] },
+        { label: "Discipline being defined", value: 1, suffix: "", sparkline: [{ n: 60 }, { n: 64 }, { n: 70 }, { n: 72 }, { n: 78 }, { n: 80 }, { n: 84 }, { n: 90 }] },
+      ],
+    } as never,
+  });
+
+  await payload.updateGlobal({
+    slug: "process-flow",
+    data: {
+      nodes: [
+        { id: "input", label: "Input", desc: "Photos · voice · text · context", icon: "dot" },
+        { id: "tags", label: "Tags", desc: "Pure-function classifier", icon: "tag" },
+        { id: "writer", label: "Writer", desc: "Bounded LLM, contract I/O", icon: "pen" },
+        { id: "memory", label: "Memory", desc: "pgvector + episodic store", icon: "database" },
+        { id: "output", label: "Output", desc: "Traceable, cited, refusable", icon: "send" },
+      ],
+    } as never,
+  });
+
+  await payload.updateGlobal({
+    slug: "home-page",
+    data: {
+      heroEyebrow: "Agentic Engineering · HCMUT · Founded 2026",
+      heroHeadline:
+        "We don't teach AI. We institutionalize the engineering discipline AI-native software demands.",
+      heroKeywords: [{ word: "bounded" }, { word: "contract-based" }, { word: "shipped" }, { word: "traceable" }],
+      heroLiveBandSuffix: "HCMUT",
+      manifestoQuote: "Bounded models. Contract-based pipelines. Shipped systems.",
+      ctaBands: [
+        { label: "Apply to the founding cohort", href: "/join" },
+        { label: "Read the engineering journal", href: "/journal" },
+        { label: "View open-source projects", href: "/projects" },
+      ],
+    } as never,
+  });
+
   console.log("seed: done");
   process.exit(0);
 }
