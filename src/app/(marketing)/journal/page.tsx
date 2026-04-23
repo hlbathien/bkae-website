@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
-import { posts } from "@/lib/cms";
+import { fetchPosts } from "@/lib/cms-server";
 
 export const metadata = { title: "Journal" };
 
-export default function JournalIndex() {
+export default async function JournalIndex() {
+  const posts = await fetchPosts();
   return (
     <Frame className="pt-40 pb-32">
       <p className="eyebrow mb-4">[ Index · Journal ]</p>

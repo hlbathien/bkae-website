@@ -1,8 +1,9 @@
 import Frame from "@/components/primitives/Frame";
 import Link from "next/link";
-import { posts } from "@/lib/cms";
+import { fetchPosts } from "@/lib/cms-server";
 
 export async function generateStaticParams() {
+  const posts = await fetchPosts();
   const categories = Array.from(new Set(posts.map((p) => p.category.toLowerCase())));
   return categories.map((slug) => ({ slug }));
 }
@@ -18,6 +19,7 @@ export default async function JournalTagPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const posts = await fetchPosts();
   const filtered = posts.filter((p) => p.category.toLowerCase() === slug.toLowerCase());
 
   return (

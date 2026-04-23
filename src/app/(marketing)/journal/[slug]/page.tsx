@@ -1,24 +1,26 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
-import { posts } from "@/lib/cms";
+import { fetchPost, fetchPosts } from "@/lib/cms-server";
 import ReadingProgress from "@/components/chrome/ReadingProgress";
 import ToCRail from "@/components/chrome/ToCRail";
 import QwenPulse from "@/components/motion/QwenPulse";
+import { LD, articleLD, breadcrumbLD } from "@/lib/jsonld";
 
 export async function generateStaticParams() {
+  const posts = await fetchPosts();
   return posts.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = posts.find((x) => x.slug === slug);
+  const p = await fetchPost(slug);
   return { title: p?.title ?? "Post" };
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = posts.find((x) => x.slug === slug);
+  const p = await fetchPost(slug);
   if (!p) notFound();
 
   // Demonstration content to showcase pull-quotes and dropcap
@@ -37,6 +39,22 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <>
+      <LD
+        data={articleLD({
+          title: p.title,
+          slug: p.slug,
+          excerpt: p.excerpt,
+          publishedAt: p.publishedAt,
+          category: p.category,
+        })}
+      />
+      <LD
+        data={breadcrumbLD([
+          { name: "Home", url: "/" },
+          { name: "Journal", url: "/journal" },
+          { name: p.title, url: `/journal/${p.slug}` },
+        ])}
+      />
       <ReadingProgress />
       <ToCRail />
       

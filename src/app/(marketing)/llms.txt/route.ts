@@ -1,9 +1,10 @@
-import { projects, posts } from "@/lib/cms";
+import { fetchPosts, fetchProjects } from "@/lib/cms-server";
 
 export const revalidate = 3600;
 
 export async function GET() {
   const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inference.club";
+  const [projects, posts] = await Promise.all([fetchProjects(), fetchPosts()]);
 
   const lines: string[] = [
     "# Agentic Engineering — llms.txt",

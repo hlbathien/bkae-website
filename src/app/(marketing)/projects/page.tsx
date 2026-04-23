@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import Tag from "@/components/primitives/Tag";
-import { projects } from "@/lib/cms";
+import { fetchProjects } from "@/lib/cms-server";
 
 export const metadata = { title: "Projects" };
 
-export default function ProjectsIndex() {
+export default async function ProjectsIndex() {
+  const projects = await fetchProjects();
   return (
     <Frame className="pt-40 pb-32">
       <p className="eyebrow mb-4">[ Index · Projects ]</p>

@@ -1,4 +1,4 @@
-import { posts } from "@/lib/cms";
+import { fetchPosts } from "@/lib/cms-server";
 
 export const revalidate = 3600;
 
@@ -12,6 +12,7 @@ function esc(s: string) {
 
 export async function GET() {
   const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://inference.club";
+  const posts = await fetchPosts();
   const items = posts
     .map(
       (p) => `<item>

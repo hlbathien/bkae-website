@@ -3,22 +3,25 @@ import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import Tag from "@/components/primitives/Tag";
 import CountUp from "@/components/motion/CountUp";
-import { projects } from "@/lib/cms";
+import { fetchProject, fetchProjects } from "@/lib/cms-server";
 import ToCRail from "@/components/chrome/ToCRail";
 import RevealText from "@/components/motion/RevealText";
+import { LD, breadcrumbLD, creativeWorkLD } from "@/lib/jsonld";
 
 export async function generateStaticParams() {
+  const projects = await fetchProjects();
   return projects.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = projects.find((x) => x.slug === slug);
+  const p = await fetchProject(slug);
   return { title: p?.title ?? "Project" };
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const projects = await fetchProjects();
   const projectIndex = projects.findIndex((x) => x.slug === slug);
   const p = projects[projectIndex];
   if (!p) notFound();
@@ -27,6 +30,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
+      <LD data={creativeWorkLD({ title: p.title, slug: p.slug, problem: p.problem, stack: p.stack })} />
+      <LD
+        data={breadcrumbLD([
+          { name: "Home", url: "/" },
+          { name: "Projects", url: "/projects" },
+          { name: p.title, url: `/projects/${p.slug}` },
+        ])}
+      />
       <ToCRail />
       <Frame className="pt-40 pb-32">
         <Link
