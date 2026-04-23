@@ -42,14 +42,32 @@ async function getClient(): Promise<PayloadShape | null> {
 // or as ID strings when depth=0. Mock CMS contract is `string[]` of names.
 // Normalize so consumers stay shape-agnostic.
 type RawTag = string | { name?: string; slug?: string } | null | undefined;
-type RawProject = Omit<Project, "stack"> & { stack?: RawTag[] };
+type RawProject = Omit<Project, "stack" | "cover" | "links"> & {
+  stack?: RawTag[];
+  cover?: RawMedia;
+  links?: unknown;
+};
 
 function normalizeProject(raw: unknown): Project {
   const p = raw as RawProject;
   const stack = (p.stack ?? [])
     .map((t) => (typeof t === "string" ? t : (t?.name ?? t?.slug ?? "")))
     .filter((s): s is string => typeof s === "string" && s.length > 0);
-  return { ...(p as Project), stack };
+  // Payload stores links as array of { url, kind, label }; mock shape is
+  // { github?: string; demo?: string } — map by kind.
+  const linksArr = Array.isArray(p.links) ? (p.links as { url?: string; kind?: string }[]) : [];
+  const links: Project["links"] = {};
+  for (const l of linksArr) {
+    if (!l.url) continue;
+    if (l.kind === "github") links.github = l.url;
+    else if (l.kind === "demo") links.demo = l.url;
+  }
+  return {
+    ...(p as Project),
+    stack,
+    cover: mediaUrl(p.cover) || "/cover-lumen.jpg",
+    links,
+  };
 }
 
 // ---- Projects -------------------------------------------------------------
@@ -81,12 +99,41 @@ export async function fetchProject(slug: string): Promise<Project | undefined> {
 }
 
 // ---- Posts ----------------------------------------------------------------
+// Payload Post shape differs from mock:
+//   - category: relation → Tag { name } (mock expects string)
+//   - cover: upload → Media { url } (mock expects string path)
+//   - readingTime: string (ok)
+// Normalize so consumers keep the Post contract.
+type RawMedia = string | { url?: string; filename?: string } | null | undefined;
+type RawPost = Omit<Post, "category" | "cover"> & {
+  category?: RawTag;
+  cover?: RawMedia;
+};
+
+function mediaUrl(m: RawMedia): string {
+  if (!m) return "";
+  if (typeof m === "string") return m;
+  return m.url ?? (m.filename ? `/media/${m.filename}` : "");
+}
+
+function normalizePost(raw: unknown): Post {
+  const p = raw as RawPost;
+  const cat = p.category;
+  const category =
+    typeof cat === "string" ? cat : (cat?.name ?? cat?.slug ?? "");
+  return {
+    ...(p as Post),
+    category,
+    cover: mediaUrl(p.cover) || "/journal-1.jpg",
+  };
+}
+
 export async function fetchPosts(): Promise<Post[]> {
   const p = await getClient();
   if (!p) return postsMock;
   try {
-    const res = await p.find({ collection: "posts", limit: 100, sort: "-publishedAt" });
-    return res.docs as unknown as Post[];
+    const res = await p.find({ collection: "posts", limit: 100, sort: "-publishedAt", depth: 1 });
+    return res.docs.map(normalizePost);
   } catch {
     return postsMock;
   }
@@ -100,8 +147,9 @@ export async function fetchPost(slug: string): Promise<Post | undefined> {
       collection: "posts",
       where: { slug: { equals: slug } },
       limit: 1,
+      depth: 1,
     });
-    return (res.docs[0] as unknown as Post) ?? postsMock.find((x) => x.slug === slug);
+    return res.docs[0] ? normalizePost(res.docs[0]) : postsMock.find((x) => x.slug === slug);
   } catch {
     return postsMock.find((x) => x.slug === slug);
   }

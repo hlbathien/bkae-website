@@ -113,6 +113,8 @@ export interface Config {
     footer: Footer;
     navigation: Navigation;
     'home-page': HomePage;
+    'stats-board': StatsBoard;
+    'process-flow': ProcessFlow;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -120,6 +122,8 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
+    'stats-board': StatsBoardSelect<false> | StatsBoardSelect<true>;
+    'process-flow': ProcessFlowSelect<false> | ProcessFlowSelect<true>;
   };
   locale: 'en';
   widgets: {
@@ -1590,19 +1594,76 @@ export interface Navigation {
  */
 export interface HomePage {
   id: number;
+  heroEyebrow?: string | null;
   heroHeadline: string;
+  /**
+   * Optional line beneath the display headline.
+   */
+  heroSubheadline?: string | null;
   heroKeywords?:
     | {
         word: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Right-most token in the live band (e.g. `HCMUT`).
+   */
+  heroLiveBandSuffix?: string | null;
   manifestoQuote?: string | null;
   ctaBands?:
     | {
         label: string;
         href: string;
         id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stats-board".
+ */
+export interface StatsBoard {
+  id: number;
+  items?:
+    | {
+        label: string;
+        value: number;
+        suffix?: string | null;
+        /**
+         * Optional trend points 0–100; 6–12 entries.
+         */
+        sparkline?:
+          | {
+              n: number;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "process-flow".
+ */
+export interface ProcessFlow {
+  id: number;
+  nodes?:
+    | {
+        /**
+         * stable id (input/tags/writer/...)
+         */
+        id: string;
+        label: string;
+        desc: string;
+        icon?: ('dot' | 'cpu' | 'tag' | 'pen' | 'database' | 'send' | 'shield' | 'git-branch') | null;
       }[]
     | null;
   _status?: ('draft' | 'published') | null;
@@ -1714,13 +1775,16 @@ export interface NavigationSelect<T extends boolean = true> {
  * via the `definition` "home-page_select".
  */
 export interface HomePageSelect<T extends boolean = true> {
+  heroEyebrow?: T;
   heroHeadline?: T;
+  heroSubheadline?: T;
   heroKeywords?:
     | T
     | {
         word?: T;
         id?: T;
       };
+  heroLiveBandSuffix?: T;
   manifestoQuote?: T;
   ctaBands?:
     | T
@@ -1728,6 +1792,48 @@ export interface HomePageSelect<T extends boolean = true> {
         label?: T;
         href?: T;
         id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stats-board_select".
+ */
+export interface StatsBoardSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        suffix?: T;
+        sparkline?:
+          | T
+          | {
+              n?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "process-flow_select".
+ */
+export interface ProcessFlowSelect<T extends boolean = true> {
+  nodes?:
+    | T
+    | {
+        id?: T;
+        label?: T;
+        desc?: T;
+        icon?: T;
       };
   _status?: T;
   updatedAt?: T;

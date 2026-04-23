@@ -4,7 +4,9 @@ import { fetchPosts } from "@/lib/cms-server";
 
 export async function generateStaticParams() {
   const posts = await fetchPosts();
-  const categories = Array.from(new Set(posts.map((p) => p.category.toLowerCase())));
+  const categories = Array.from(
+    new Set(posts.map((p) => (p.category ?? "").toLowerCase()).filter(Boolean)),
+  );
   return categories.map((slug) => ({ slug }));
 }
 
@@ -20,7 +22,9 @@ export default async function JournalTagPage({
 }) {
   const { slug } = await params;
   const posts = await fetchPosts();
-  const filtered = posts.filter((p) => p.category.toLowerCase() === slug.toLowerCase());
+  const filtered = posts.filter(
+    (p) => (p.category ?? "").toLowerCase() === slug.toLowerCase(),
+  );
 
   return (
     <Frame className="pt-40 pb-24">
