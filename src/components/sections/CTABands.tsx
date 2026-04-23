@@ -54,7 +54,19 @@ function Band({
     if (typeof window === "undefined" || !imgWrap.current || !root.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const { gsap } = ensureGsap();
-    
+
+    // Phase 35: per-band word reveal on enter
+    if (word.current) {
+      gsap.from(word.current, {
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        ease: "expo.out",
+        delay: index * 0.08,
+        scrollTrigger: { trigger: root.current, start: "top 88%" },
+      });
+    }
+
     const xTo = gsap.quickTo(imgWrap.current, "x", { duration: 0.4, ease: "power3.out" });
     const yTo = gsap.quickTo(imgWrap.current, "y", { duration: 0.4, ease: "power3.out" });
     const scaleTo = gsap.quickTo(imgWrap.current, "scale", { duration: 0.3, ease: "back.out(1.5)" });
@@ -93,7 +105,7 @@ function Band({
         el.removeEventListener("mousemove", handleMove);
       }
     };
-  }, []);
+  }, [index]);
 
   return (
     <Link

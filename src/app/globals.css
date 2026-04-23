@@ -534,3 +534,26 @@ input:focus, textarea:focus, select:focus {
   section { break-inside: avoid; }
   .eyebrow { color: #D4870A !important; }
 }
+
+/* Phase 35 liveliness: divider shimmer utility.
+   Section top borders get a subtle amber glow pulse when first scrolled into view.
+   Opt-in via class="divider-shimmer" on any element with a top border. */
+@keyframes divider-shimmer {
+  0%   { box-shadow: 0 -1px 0 0 var(--color-amber-pale), inset 0 0 0 0 transparent; opacity: 0; }
+  50%  { box-shadow: 0 -1px 12px 0 var(--color-amber-pale); opacity: 0.6; }
+  100% { box-shadow: 0 -1px 0 0 transparent; opacity: 0; }
+}
+.divider-shimmer {
+  position: relative;
+}
+.divider-shimmer::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 1px;
+  pointer-events: none;
+  animation: divider-shimmer 1800ms var(--ease-out-expo) 120ms 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .divider-shimmer::before { animation: none; }
+}
