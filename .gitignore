@@ -1,11 +1,49 @@
+# Dependencies and build output
 node_modules
 .next
 out
 dist
+.turbo
+next-env.d.ts
+*.tsbuildinfo
+
+# Environment and secrets
 .env*
 !.env.example
+
+# Local agent and editor state
+.claude/
+.cursor/
+.vscode/
+
+# Private source assets
+founder/
+media/
+
+# Browser, Playwright, and debug artifacts
+.playwright-cli/
+.playwright-mcp/
+output/
+test-results/
+playwright-report/
+
+# Local debug captures
+/d-header.png
+/d-process.png
+/final-m-hero.png
+/logo-tight-viewbox.png
+/m-1200.png
+/m-4000.png
+/m-7000.png
+/m-hero.png
+/m1-hero.png
+/m2-1500.png
+/mobile-1-hero.png
+/debug-*.png
+/screenshot-*.png
+/page-*.png
+
+# System files and logs
 .DS_Store
 *.log
 .vercel
-.turbo
-next-env.d.ts
