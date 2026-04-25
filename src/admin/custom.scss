@@ -62,3 +62,34 @@ button:focus-visible,
   outline: 2px solid #D4870A !important;
   outline-offset: 2px !important;
 }
+
+/* Admin nav group separators — make Collections / Globals / Admin / Content / Taxonomy
+ * visually distinct from their items. */
+.nav-group,
+[class*="nav-group"] {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #282820;
+}
+.nav-group:first-child,
+[class*="nav-group"]:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.nav-group__label,
+[class*="nav-group__label"],
+[class*="nav-group-label"],
+.nav__group-label {
+  color: #D4870A !important;
+  font-size: 11px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+  padding: 6px 0 4px !important;
+  opacity: 1 !important;
+}
+.nav__link,
+[class*="nav__link"] {
+  padding-left: 12px !important;
+}

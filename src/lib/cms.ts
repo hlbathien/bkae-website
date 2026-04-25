@@ -28,6 +28,8 @@ export type Post = {
   category: string;
   readingTime: string;
   publishedAt: string;
+  bodyMarkdown?: string;
+  body?: unknown;
 };
 
 export type Member = {

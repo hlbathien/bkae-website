@@ -38,14 +38,14 @@ export default function Header() {
     <>
       <header
         ref={ref}
+        style={{ top: "var(--marquee-height)" }}
         className={cn(
           "fixed left-0 right-0 z-40 transition-all duration-300",
-          shrunk ? "top-[var(--marquee-height)]" : "top-[calc(var(--marquee-height)+24px)]",
           shrunk
             ? overManifesto
-              ? "h-14 bg-[rgba(245,240,232,0.9)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"
-              : "h-14 bg-[rgba(12,12,9,0.7)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
-            : "h-20 bg-transparent mix-blend-difference",
+              ? "h-14 bg-[rgba(245,240,232,0.92)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink)]"
+              : "h-14 bg-[rgba(12,12,9,0.78)] backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--color-ink3)]"
+            : "h-16 bg-[rgba(12,12,9,0.85)] backdrop-blur-md border-b border-[var(--color-ink3)]",
         )}
       >
         <div className={cn("mx-auto flex h-full max-w-[1600px] items-center justify-between px-[var(--gutter)] transition-colors duration-300", overManifesto ? "text-[var(--color-ink)]" : "text-[var(--color-ivory)]")}>
@@ -65,18 +65,15 @@ export default function Header() {
                 key={n.href}
                 href={n.href}
                 className={cn(
-                  "relative py-1 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] transition-colors",
-                  active 
-                    ? "text-[var(--color-amber)]" 
-                    : (overManifesto 
-                      ? "text-[var(--color-ink)] hover:text-[var(--color-amber)]" 
+                  "nav-underline relative py-1 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-eyebrow)] transition-colors",
+                  active
+                    ? "text-[var(--color-amber)] is-active"
+                    : (overManifesto
+                      ? "text-[var(--color-ink)] hover:text-[var(--color-amber)]"
                       : "text-[var(--color-ivory2)] hover:text-[var(--color-ivory)]")
                 )}
               >
                 {n.label}
-                {active && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[var(--color-amber)]" />
-                )}
               </Link>
             )})}
           </nav>

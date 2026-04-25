@@ -65,7 +65,7 @@ function normalizeProject(raw: unknown): Project {
   return {
     ...(p as Project),
     stack,
-    cover: mediaUrl(p.cover) || "/cover-lumen.jpg",
+    cover: mediaUrl(p.cover) || "/cover-lumen.svg",
     links,
   };
 }
@@ -124,7 +124,7 @@ function normalizePost(raw: unknown): Post {
   return {
     ...(p as Post),
     category,
-    cover: mediaUrl(p.cover) || "/journal-1.jpg",
+    cover: mediaUrl(p.cover) || "/cover-lumen.svg",
   };
 }
 

@@ -1,69 +1,50 @@
-# Copy Content — Agentic Engineering Website
+# Copy Inventory
 
-> This file tracks content that may need human review. Items marked `[NEEDS REVIEW]` require attention.
+This file tracks current user-facing copy surfaces that are intentionally authored in code or seed data. It is not a backlog or review queue.
 
----
+## Brand
 
-## Hero Section (`src/components/sections/Hero.tsx`)
+- Public name: `Agentic Engineering`
+- Short discipline line: `Bounded LLMs. Contract-based pipelines. Shipped systems.`
+- Former brand: `Inference` may remain only in placeholder URLs or preserved internal keys.
 
-**Headline:** "We don't teach AI. We institutionalize the engineering discipline AI-native software demands."
+## Home Page
 
-**Status:** ✅ Final
+Home page fallback copy lives in `src/lib/cms.ts` as `homePageMock` and can be overridden through the Payload `home-page` global.
 
----
+- Hero eyebrow: `Agentic Engineering · HCMUT · Founded 2026`
+- Hero headline: `We don't teach AI. We institutionalize the engineering discipline AI-native software demands.`
+- Hero keywords: `bounded`, `contract-based`, `shipped`, `traceable`
+- Manifesto quote: `Bounded models. Contract-based pipelines. Shipped systems.`
+- CTA bands:
+  - `Apply to the founding cohort`
+  - `Read the engineering journal`
+  - `View open-source projects`
 
-## Manifesto Section (`src/components/sections/Manifesto.tsx`)
+## Core Proof Points
 
-**Pull quote:** "Bounded models. Contract-based pipelines. Shipped systems."
+These proof points appear in fallback project and stats data:
 
-**Status:** ✅ Final
+- `2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025`
+- `200+ teams beaten`
+- `2 production systems shipped`
+- Lumen: multimodal journal engine with an async tags -> writer -> memory pipeline
+- Atlas: traceable clinical handoff with deterministic contracts and bounded LLM explanation
 
----
+## Content Sources
 
-## CTA Bands (`src/components/sections/CTABands.tsx`)
+- Navigation, footer, home page, process flow, stats board, and manifesto pillars: Payload globals with fallback fixtures.
+- Projects, posts, events, members, announcements, and pages: Payload collections with fallback fixtures for core routes.
+- Journal body rendering: Markdown through `src/lib/markdown.ts`.
+- SEO titles/descriptions: route metadata and Payload SEO plugin fields.
 
-**Band 1:** "View open-source projects"
-**Band 2:** "Read the engineering journal"
-**Band 3:** "Join the founding cohort"
+## Placeholders That Are Intentional
 
-**Status:** ✅ Final
+The following placeholders remain until real external accounts or production services are assigned:
 
----
+- `https://inference.club`
+- `https://github.com/inference-club/*`
+- `hello@inference.club`
+- `GITHUB_ORG=inference-club`
 
-## Footer Colophon (`src/components/chrome/Footer.tsx`)
-
-**Text:**
-- Type: Syne · Instrument Serif · DM Mono
-- Stack: Next.js 15 · GSAP · Lenis · Payload
-- Deploy: Vercel · Neon · R2
-
-**Status:** ✅ Final
-
----
-
-## Journal Placeholder (`src/app/journal/[slug]/page.tsx`)
-
-**Text:** "Full article content will be available soon. This page demonstrates the typographic rhythm and layout structure for long-form journal entries."
-
-**Status:** [NEEDS REVIEW] — Replace with actual article content when available
-
----
-
-## CMS Data (`src/lib/cms.ts`)
-
-All project and journal data in the CMS mock is placeholder content.
-
-**Status:** [NEEDS REVIEW] — Verify all dates, numbers, and descriptions are accurate
-
----
-
-## Summary
-
-| Section | Status |
-|---------|--------|
-| Hero | ✅ Final |
-| Manifesto | ✅ Final |
-| CTA Bands | ✅ Final |
-| Footer | ✅ Final |
-| Journal placeholder | [NEEDS REVIEW] |
-| CMS data | [NEEDS REVIEW] |
+Update this file, `.env.example`, seed data, and metadata together when those values are replaced.

@@ -22,12 +22,12 @@ export async function GET() {
     "",
     "## Projects",
     ...projects.map(
-      (p) => `- [${p.title}](${SITE}/projects/${p.slug}): ${p.problem.replace(/\s+/g, " ")}`,
+      (p) => `- [${p.title}](${SITE}/projects/${p.slug}): ${(p.problem ?? "").replace(/\s+/g, " ")}`,
     ),
     "",
     "## Journal",
     ...posts.map(
-      (p) => `- [${p.title}](${SITE}/journal/${p.slug}): ${p.excerpt.replace(/\s+/g, " ")}`,
+      (p) => `- [${p.title}](${SITE}/journal/${p.slug}): ${(p.excerpt ?? "").replace(/\s+/g, " ")}`,
     ),
     "",
     "## Policy",

@@ -1,436 +1,276 @@
-# SOURCE OF TRUTH — Inference (BKAE) Website
+# Source Of Truth
 
-> Canonical spec. Any divergence between code and this file = bug. Update this file in same PR as the change.
+This is the canonical current-state contract for `bkae-website`. Update this file in the same change as any architecture, route, data, or workflow change it describes.
 
----
-
-## 1. Identity
+## Identity
 
 | Field | Value |
-|---|---|
-| Org name | Agentic Engineering |
-| Internal alias | `bkae-website` (do not rename) |
-| Affiliation | HCMUT (Ho Chi Minh City University of Technology) |
-| Discipline | Bounded LLMs · Contract-based pipelines · Shipped systems |
-| Founders | 2 first-year HCMUT students |
-| Proof | 2nd place — Best Use of Qwen, GenAI Hackathon Vietnam 2025 |
-| Locale | Asia/Ho_Chi_Minh, English-only v1 |
-| Wordmark lockup | `[logo-mark amber 14px] agentic engineering.` (lowercase, period in amber) |
+| --- | --- |
+| Public name | Agentic Engineering |
+| Repository alias | `bkae-website` |
+| Affiliation | HCMUT, Ho Chi Minh City University of Technology |
+| Discipline | Bounded LLMs, contract-based pipelines, shipped systems |
+| Proof point | 2nd place, Best Use of Qwen, GenAI Hackathon Vietnam 2025 |
+| Locale | English-only public site, Asia/Ho_Chi_Minh operating context |
+| Visual voice | Dark editorial system, amber signal color, technical-institutional tone |
 
-## 2. Goals (in priority order)
+The former "Inference" name may still appear only in placeholder URLs, legacy storage keys, or intentionally preserved internal identifiers.
 
-1. Convert qualified students → application submission (`/join`)
-2. Establish credibility (projects, hackathon proof, manifesto)
-3. Recruit founding cohort
-4. Publish field notes (journal)
+## Product Scope
 
-## 3. Non-goals (v1)
+Primary goals:
 
-- E-commerce, paid courses, member portal, auth, comments, i18n, blog comments, search, dark/light toggle (dark only).
+1. Convert qualified HCMUT students through `/join`.
+2. Establish credibility through projects, essays, team context, and the hackathon proof point.
+3. Provide an editable Payload CMS for projects, posts, events, members, pages, navigation, footer, and homepage/global content.
+4. Publish machine-readable surfaces for crawlers, LLMs, RSS readers, SEO, and social previews.
 
-## 4. Brand System
+Current non-goals:
 
-### 4.1 Palette (CSS vars; defined in `globals.css @theme`)
+- Public member portal
+- Paid courses or commerce
+- Comments
+- Multi-locale content
+- Analytics or third-party tracking
+- Public light/dark theme toggle
 
-| Token                 | Hex       | Use                         |
-| --------------------- | --------- | --------------------------- |
-| `--color-ink`         | `#0C0C09` | Page bg                     |
-| `--color-ink2`        | `#1A1A15` | Card bg                     |
-| `--color-ink3`        | `#282820` | Borders, dividers           |
-| `--color-amber`       | `#D4870A` | Primary accent, CTAs, links |
-| `--color-amber-hot`   | `#F0A020` | Hover state, highlights     |
-| `--color-amber-pale`  | `#FDE8B8` | Subtle washes               |
-| `--color-ivory`       | `#F5F0E8` | Headlines                   |
-| `--color-ivory2`      | `#EDE8DC` | Body                        |
-| `--color-steel`       | `#7A8490` | Meta text                   |
-| `--color-steel-light` | `#B2BBC4` | Secondary body              |
+## Runtime Stack
 
-**Rule:** No raw hex in components. Use tokens.
-
-### 4.2 Typography
-
-| Role          | Family           | Weight     | Source       |
-| ------------- | ---------------- | ---------- | ------------ |
-| Display       | Syne             | 800        | Google Fonts |
-| Accent italic | Instrument Serif | 400 italic | Google Fonts |
-| Body / mono   | DM Mono          | 400 / 500  | Google Fonts |
-
-Loaded via `@import` in `globals.css`. Helpers: `.font-display`, `.font-serif-italic`, default mono.
-
-### 4.3 Motion principles
-
-- Restraint over spectacle.
-- All entrance/scrub motion guarded by `prefers-reduced-motion: reduce`.
-- Default ease: `expo.out` for entrances, `power3.inOut` for scrubs.
-- No motion on critical CTAs that delays interaction > 200ms.
-
-## 5. Information Architecture
-
-### v1 (shipped)
-```
-/                       Landing
-/projects               Index
-/projects/[slug]        Detail (lumen-journal, atlas-clinical)
-/journal                Index
-/journal/[slug]         Detail
-/manifesto              Four pillars
-/join                   Application form
-```
-
-### v2 (phases 19–30 — Payload-backed)
-```
-/about                              Team + timeline
-/about/members/[slug]               Member profile
-/events                             Workshops / talks index
-/events/[slug]                      Event detail
-/workshops                          Curricula / syllabi
-/press                              Press kit
-/sponsor                            Sponsorship tiers
-/uses                               Stack / tools
-/changelog                          Site changelog
-/journal/tag/[slug]                 Tag archive
-/search                             Global search
-/admin/[[...segments]]              Payload admin panel
-/api/[...slug]                      Payload REST
-/api/graphql, /api/graphql-playground
-/api/og                             Dynamic OG via next/og (edge)
-/api/preview                        Draft-preview enable
-/api/rss                            Journal RSS
-/api/revalidate                     Manual revalidate hook
-/llms.txt                           Markdown index for LLM crawlers
-/llms-full.txt                      Full content bundle for LLM ingestion
-/humans.txt                         Credits
-/.well-known/security.txt
-/.well-known/ai.txt
-```
-
-## 6. Tech Stack (locked)
-
-- Next.js **16.2.4** App Router, React **19.2**
+- Next.js `16.2.4`, App Router, route groups
+- React `19.2`
 - TypeScript strict
-- Tailwind **v4** beta + `@theme` tokens, PostCSS, autoprefixer
-- GSAP 3 + ScrollTrigger
-- Lenis 1.x smooth scroll, wired to GSAP ticker
-- `lucide-react` icons
-- `react-hook-form` + `zod` (form validation; `/join` only for v1)
-- `clsx` for class composition
-- Mock CMS in `src/lib/cms.ts`. Payload CMS = post-v1.
-- Node 20+, pnpm
+- Tailwind CSS v4 beta through `@tailwindcss/postcss` and `@theme` tokens
+- GSAP 3 and ScrollTrigger
+- Lenis smooth scroll wired to GSAP ticker
+- Payload CMS `3.83`
+- Postgres through `@payloadcms/db-postgres`
+- Payload plugins: SEO, form builder, search, nested docs
+- Payload rich text: Lexical
+- S3-compatible upload storage dependencies are installed but not registered in `payload.config.ts`; media currently uses local Payload uploads
+- `react-hook-form` and `zod` for the join flow
+- `ogl` for the hero WebGL visual
+- `lucide-react`, `clsx`, `server-only`, `graphql`
 
-**Forbidden:** styled-components, emotion, framer-motion, locomotive-scroll, three.js, jQuery.
+Do not add a runtime dependency without explicit approval. `plugin-redirects` and cloud storage packages are installed but redirects are not registered until middleware is implemented.
 
-## 7. Directory Layout (canonical)
+## Route Architecture
 
-```
+`src/app/layout.tsx` is bare and returns children only. Route groups own their own `<html>` and `<body>` shells.
+
+Marketing shell:
+
+- `src/app/(marketing)/layout.tsx`
+- Renders fonts, JSON-LD, draft banner, no-script notice, smooth scroll provider, page transition, skip link, marquee, header, grid overlay, scroll rail, audio toggle, custom cursor, footer, and `main#main`.
+
+Payload shell:
+
+- `src/app/(payload)/layout.tsx`
+- Renders Payload's admin shell separately so marketing GSAP/Lenis code does not enter the admin client bundle.
+
+## Public Routes
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Landing page: Hero, Manifesto, Projects, Process, Stats, JournalPreview, CTABands |
+| `/about` | Team/timeline overview |
+| `/about/members/[slug]` | Member profile |
+| `/events` | Event index |
+| `/events/[slug]` | Event detail |
+| `/projects` | Project index |
+| `/projects/[slug]` | Project detail |
+| `/journal` | Journal index |
+| `/journal/[slug]` | Journal detail |
+| `/journal/tag/[slug]` | Journal tag archive |
+| `/manifesto` | Manifesto pillars |
+| `/join` | Founding-cohort application form |
+| `/press` | Press kit |
+| `/sponsor` | Sponsorship tiers |
+| `/uses` | Stack/tools page |
+| `/changelog` | Site changelog |
+| `/search` | Client search UI |
+| `not-found.tsx` | Branded 404 |
+| `error.tsx` | Branded error boundary |
+
+Dynamic public pages use async `params`, `generateStaticParams`, and `generateMetadata` where applicable.
+
+## Machine-Readable And API Routes
+
+| Route | Purpose |
+| --- | --- |
+| `/robots.txt` | Bot policy |
+| `/sitemap.xml` | Static and dynamic sitemap |
+| `/llms.txt` | Compact LLM index |
+| `/llms-full.txt` | Larger LLM content bundle |
+| `/humans.txt` | Credits |
+| `/.well-known/security.txt` | Security contact |
+| `/.well-known/ai.txt` | AI-use statement |
+| `POST /api/join` | Join-form validation, in-memory rate limit, fingerprint-only logging |
+| `GET /api/og` | Dynamic Open Graph image |
+| `GET /api/rss` | Journal RSS |
+| `GET|POST /api/preview` | Draft preview enable |
+| `GET|POST /api/preview/exit` | Draft preview exit |
+| `POST /api/revalidate` | Header-authenticated revalidation |
+| `/api/[...slug]` | Payload REST |
+| `/api/graphql` | Payload GraphQL |
+| `/api/graphql-playground` | Payload GraphQL playground |
+
+## CMS Collections And Globals
+
+Payload collections:
+
+- `users`
+- `media`
+- `tags`
+- `members`
+- `projects`
+- `posts`
+- `events`
+- `announcements`
+- `pages`
+- Plugin collections generated by Payload form/search plugins
+
+Payload globals:
+
+- `site-settings`
+- `manifesto-pillars`
+- `footer`
+- `navigation`
+- `home-page`
+- `stats-board`
+- `process-flow`
+
+`src/lib/cms-server.ts` normalizes Payload output into these public contracts from `src/lib/cms.ts`:
+
+- `Project`
+- `Post`
+- `Member`
+- `Announcement`
+- `Stat`
+- `ProcessNode`
+- `HomePageContent`
+
+Mock fixture slugs that must remain available as fallbacks:
+
+- Projects: `lumen-journal`, `atlas-clinical`
+- Posts: `bounded-llms`, `vibe-discipline`, `qwen-hackathon`
+
+## Directory Contract
+
+```text
 src/
+  access/          Payload access helpers
+  admin/           Payload admin branding and dashboard components
   app/
-    layout.tsx
-    page.tsx
-    globals.css
-    projects/page.tsx
-    projects/[slug]/page.tsx
-    journal/page.tsx
-    journal/[slug]/page.tsx
-    journal/tag/[slug]/page.tsx      # v2
-    manifesto/page.tsx
-    join/page.tsx
-    about/page.tsx                   # v2
-    about/members/[slug]/page.tsx    # v2
-    events/page.tsx                  # v2
-    events/[slug]/page.tsx           # v2
-    workshops/page.tsx               # v2
-    press/page.tsx                   # v2
-    sponsor/page.tsx                 # v2
-    uses/page.tsx                    # v2
-    changelog/page.tsx               # v2
-    search/page.tsx                  # v2
-    (payload)/admin/[[...segments]]/page.tsx    # v2 — Payload admin
-    (payload)/api/[...slug]/route.ts            # v2 — Payload REST
-    (payload)/api/graphql/route.ts              # v2
-    (payload)/api/graphql-playground/route.ts   # v2
-    api/join/route.ts
-    api/og/route.ts                  # v2 — dynamic OG (edge)
-    api/preview/route.ts             # v2
-    api/rss/route.ts                 # v2
-    api/revalidate/route.ts          # v2
-    llms.txt/route.ts                # v2
-    llms-full.txt/route.ts           # v2
-    humans.txt/route.ts              # v2
-    .well-known/security.txt/route.ts# v2
-    .well-known/ai.txt/route.ts      # v2
+    layout.tsx     Bare root layout
+    globals.css    Design tokens and global CSS
+    robots.ts
+    sitemap.ts
+    (marketing)/   Public site routes and marketing layout
+    (payload)/     Payload admin and Payload API route group
+    api/           Public non-Payload API routes
+  collections/     Payload collection configs
   components/
-    chrome/    SmoothScroll, Header, MarqueeBar, GridOverlay, Cursor, Footer
-    motion/    RevealText, CountUp, MagneticBtn, MarqueeRow
-    primitives/ Frame, Tag, Button
-    sections/  Hero, Manifesto, Projects, Process, Stats, JournalPreview, CTABands
-  lib/        cms.ts, gsap.ts, fonts.ts, utils.ts
-  collections/   Users, Media, Tags, Members, Projects, Posts, Events, Announcements, Pages
-  globals/       SiteSettings, ManifestoPillars, Footer, Navigation, HomePage, StatsBoard, ProcessFlow
-  blocks/        # v2 — page-builder + lexical blocks
-  access/        # v2 — access-control helpers
-  hooks/         # v2 — afterChange revalidate, readingTime calc
-  admin/         # v2 — admin UI overrides (Logo, Icon, Dashboard, SCSS)
-  payload-types.ts  # v2 — generated
-payload.config.ts    # v2 (repo root)
-docker-compose.yml   # v2 (repo root)
-docs/           this file + others
+    chrome/        Global shell, navigation, motion chrome, cursor, rails
+    motion/        Reusable animation components
+    primitives/    Base UI primitives
+    sections/      Landing-page sections
+  globals/         Payload global configs
+  hooks/           Revalidation, reading-time, and interaction hooks
+  lib/             CMS facades, crypto, fonts, GSAP, JSON-LD, markdown, utilities
+  migrations/      Payload migrations
+  payload-types.ts Generated Payload types; do not hand-edit
+scripts/           Seed and asset helper scripts
+tests/             Node and Playwright tests
 ```
 
-New top-level dirs require update to this file.
+## Design System
 
-## 8. CMS Data Contract (`src/lib/cms.ts`)
+Color tokens live in `src/app/globals.css` and should be used instead of raw component hex values:
 
-Types are source of truth. Match exactly.
+- `--color-ink`
+- `--color-ink2`
+- `--color-ink3`
+- `--color-amber`
+- `--color-amber-hot`
+- `--color-amber-pale`
+- `--color-ivory`
+- `--color-ivory2`
+- `--color-steel`
+- `--color-steel-light`
 
-```ts
-type Project = {
-  slug: string;
-  index: string;          // "01", "02" — display ordinal
-  title: string;
-  eyebrow: string;
-  problem: string;
-  constraint: string;
-  outcome: string;
-  stack: string[];
-  stats: { label: string; value: number; suffix?: string }[];
-  cover: string;          // public path to cover image
-  links: { github?: string; demo?: string };
-};
+Fonts are loaded through `src/lib/fonts.ts`:
 
-type Post = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  cover: string;
-  category: string;
-  readingTime: string;
-  publishedAt: string;
-};
+- Syne for display
+- Instrument Serif italic for accent statements
+- DM Mono for body/mono text
 
-type Member = {
-  slug: string;
-  name: string;
-  role: string;
-  bio: string;
-  links: { github?: string; x?: string };
-};
+Logo assets:
 
-type Announcement = { text: string; href: string };
+- `public/logo.svg`
+- `public/logo.png`
+- `src/components/primitives/LogoMark.tsx`
+- `src/app/icon.svg`
+- `src/app/(marketing)/icon.svg`
 
-type Stat = { value: number; suffix?: string; label: string; sparkline?: number[] };
+## Interaction Features
 
-type ProcessNode = { id: string; label: string; desc: string; icon?: string };
+Current global interaction and motion features include:
 
-type HomePageContent = {
-  heroEyebrow: string;
-  heroHeadline: string;
-  heroSubheadline?: string;
-  heroKeywords: string[];
-  heroLiveBandSuffix: string;
-  manifestoQuote: string;
-  ctaBands: { label: string; href: string }[];
-};
+- Lenis smooth scrolling
+- GSAP-powered landing interactions
+- WebGL hero blob through `HeroBlob`
+- Reveal text, count-up, magnetic buttons, marquee rows, Qwen pulse
+- Page transition shell
+- Custom cursor with `data-cursor` states
+- Grid overlay and console-facing interaction hooks
+- Scroll rail
+- Reading progress and ToC rail on content details
+- Audio toggle, opt-in and off by default
+- Live favicon component
+- Branded 404 and error boundary
+
+All motion must respect `prefers-reduced-motion` and must not block critical CTA interaction.
+
+## Security And Environment
+
+Active environment variables are documented in `.env.example`:
+
+- `DATABASE_URI`
+- `PAYLOAD_SECRET`
+- `PREVIEW_SECRET`
+- `NEXT_PUBLIC_SITE_URL`
+
+Documented placeholders that are not active runtime integrations yet:
+
+- `GITHUB_ORG`
+- `S3_ENDPOINT`
+- `S3_BUCKET`
+- `S3_REGION`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_FORCE_PATH_STYLE`
+
+Security-sensitive behavior:
+
+- `PAYLOAD_SECRET` throws in production if missing or left as the placeholder.
+- Preview and revalidation secrets use timing-safe comparison from `src/lib/crypto.ts`.
+- Revalidation accepts the secret in the `x-revalidate-secret` header.
+- Preview routes validate collection and slug.
+- `/api/join` logs only a SHA-256 fingerprint, not raw PII.
+- Docker Postgres and Adminer bind to `127.0.0.1`.
+- Remote images are allowlisted in `next.config.ts`.
+- JSON-LD escapes unsafe characters in `src/lib/jsonld.tsx`.
+
+## Verification
+
+Use these checks before claiming docs or architecture are current:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm exec tsx --test tests/*.test.ts
+pnpm exec playwright test
 ```
 
-Required projects in v1: `lumen-journal`, `atlas-clinical`.
-
-Globals `stats-board`, `process-flow`, `home-page` back the Stats / Process / Hero+Manifesto+CTABands sections respectively. Mock fallbacks (`stats`, `processNodes`, `homePageMock`) live in `src/lib/cms.ts`. Server facade exposes `fetchStats()`, `fetchProcessNodes()`, `fetchHomePage()` in `src/lib/cms-server.ts`.
-
-## 9. Page Contracts
-
-### `/` Landing — section order, top→bottom
-
-1. Hero (RevealText headline, keyword chips, live band, scroll cue)
-2. Manifesto pull-quote
-3. Projects (one ScrollTrigger-pinned scene per project)
-4. Process (5-stage horizontal scroll-jack; vertical on mobile)
-5. Stats (4-col CountUp)
-6. JournalPreview (1 hero + 2 small)
-7. CTABands (3 bands: Apply / Read manifesto / Browse work)
-
-### `/projects` Index
-
-Cards w/ hover → border amber.
-
-### `/projects/[slug]`
-
-Async `params` (Next 15). `generateStaticParams` + `generateMetadata`. Layout: title block + 8/4 grid (problem/constraint/outcome | stack/stats/links).
-
-### `/journal` Index, `/journal/[slug]` Detail
-
-Same async params pattern. Stub long-form body.
-
-### `/manifesto`
-
-Four pillars from `PILLARS` const.
-
-### `/join`
-
-Client form: full name, HCMUT email, year/major, what shipped (textarea). Validated via `react-hook-form + zod`. Submission: POST to `/api/join` (v1 = stub returning 200).
-
-## 10. Accessibility
-
-- Skip link to `#main` in layout (already present)
-- All interactive elements: visible focus ring (amber, 2px outline-offset)
-- Form labels `for=`, error messages `aria-describedby`
-- Color contrast: ivory-on-ink ≥ 7:1; amber-on-ink ≥ 4.5:1 — verify, don't assume
-- All motion respects `prefers-reduced-motion`
-- `Cursor` hidden on `(hover: none)` pointers
-
-## 11. Performance Budgets
-
-| Metric                 | Budget      |
-| ---------------------- | ----------- |
-| LCP (mobile, slow 4G)  | ≤ 2.5s      |
-| CLS                    | ≤ 0.05      |
-| INP                    | ≤ 200ms     |
-| JS shipped to landing  | ≤ 220 KB gz |
-| Total transfer landing | ≤ 900 KB    |
-
-Verify with `next build` route summary + Lighthouse mobile.
-
-## 12. SEO
-
-- Per-route `metadata` export (title, description)
-- `metadataBase` set in root layout
-- OG image: 1200×630, amber-on-ink wordmark (`/og.png`)
-- `robots.txt` allows all; `sitemap.ts` lists static + dynamic routes
-
-## 13. Definition of Done (per task)
-
-A change is **DONE** only if all true:
-
-- [ ] Code matches Source of Truth section it touches
-- [ ] `pnpm tsc --noEmit` → 0 errors
-- [ ] `pnpm next build` → 0 errors, ≤ existing warnings
-- [ ] No new ESLint errors
-- [ ] Visual smoke: page renders, no console errors in `pnpm dev`
-- [ ] Reduced-motion path tested (Chrome DevTools → Rendering → emulate)
-- [ ] If CMS data added: types unchanged or this doc updated
-- [ ] If new dir/dep added: this doc updated
-
-## 15. Interaction System
-
-### 15.1 Cursor state machine
-
-Custom cursor is a single-author component. Every interactive element declares intent via `data-cursor`:
-
-| Value         | Visual                                                    | Use                               |
-| ------------- | --------------------------------------------------------- | --------------------------------- |
-| _(none)_      | 32px amber ring + 6px amber dot                           | Idle                              |
-| `link`        | 44px ring, amber fill 12%, dot hides                      | Nav, inline links                 |
-| `view`        | 80px ring, ink fill 55% w/ label "VIEW"                   | Project covers, dataviz           |
-| `read`        | 48x64 rect, amber border, label "READ →"                  | Journal cards                     |
-| `drag`        | 64px ring, amber fill 8%, label "DRAG"                    | Horizontal scroll regions         |
-| `magnet`      | 56px ring, amber-hot border, snaps to target center       | Primary CTAs                      |
-| `text`        | 2x24 rect, filled amber                                   | Typography interaction            |
-| `disabled`    | 40px ring, steel border, label "×"                        | Disabled buttons                  |
-| `copy`        | 64px ring, amber fill 20%, label "COPY"                   | Snippets                          |
-| `next`        | 56px ring, label "→"                                      | Carousel next                     |
-| `prev`        | 56px ring, label "←"                                      | Carousel prev                     |
-| `external`    | 56px ring, label "↗"                                      | External links                    |
-| `play`        | 64px ring, label "▶"                                      | Video/Audio triggers              |
-| `pinned`      | 20px ring, filled amber                                   | Selection markers                 |
-
-Rules:
-- Cursor hidden on `(hover: none)` and `prefers-reduced-motion: reduce`.
-- No state may change cursor color away from amber (signal lane).
-- Label text: `font-mono 10px`, uppercase, letter-spacing `0.18em`.
-
-### 15.2 Scroll system
-
-- Lenis smooth scroll wired to GSAP ticker (existing).
-- Left-gutter vertical progress rail (desktop ≥ 1024px): 1px ivory line, amber dot marking current section, mono section label.
-- No CSS scroll-snap. Snap only via GSAP ScrollToPlugin-equivalent behavior (manual). Keep scroll linear; rail is indicator only.
-
-### 15.3 Page transitions
-
-- First visit: 4-stage loader (1.6s) ending in 4-panel stagger wipe. Stored in `sessionStorage.ae:visit-count`.
-- Returning visit: 320ms top hairline sweep.
-- Reduced-motion: skips instantly.
-- Route change: 400ms curtain-fade overlay (amber 4% → ink), then new page RevealText.
-- Shared element morph is out-of-scope v1.
-
-### 15.4 Micro-interactions contract
-
-- Every `<Link>` outside nav: must declare `data-cursor` or use `draw-underline` / `bracket-link` / `cta-fill`.
-- Every primary CTA: `MagneticBtn` wrap + `data-cursor="magnet"`.
-- Every image/cover: `data-cursor="view"`.
-- Every horizontally-scrolling track: `data-cursor="drag"`.
-- Hover timings: 200–320ms, ease `--ease-out-expo`. Never longer on layout properties.
-
-### 15.5 Easter eggs
-
-- `g` toggles GridOverlay (exists).
-- Console greeting on load: `%cInference — Bounded LLMs. Contract-based pipelines.` (amber, mono, one call in layout).
-- `↑↑↓↓←→←→BA` enables amber-trace mode (persistent grid + HUD). Session-scoped.
-
-## 16. Visual Asset Contract
-
-### 16.0 Logo Asset
-
-- The official logo mark is rendered via `LogoMark.tsx` (an inline SVG traced from raster).
-- Base asset path: `public/logo.svg` and `public/logo.png`.
-
-
-### 16.1 Project artifacts (required for each v1 project)
-
-Each Project MUST ship one of: `/cover-<slug>.jpg` (≥1600×1200, amber-on-ink authored), **or** a first-class SVG schematic rendered inline. Dot-grid placeholder = banned in shipped pages.
-
-| Project         | Artifact                                                     |
-| --------------- | ------------------------------------------------------------ |
-| `lumen-journal` | Inline SVG: 5-node pipeline (Input→Tags→Writer→Memory→Output), animated edges, contract chips |
-| `atlas-clinical`| Inline SVG: PDF source → extraction contract → traceable claim graph, citation arcs |
-
-Animations: entrance on `ScrollTrigger start: top 75%`; guard w/ reduced-motion.
-
-### 16.2 Hero visual
-
-Hero carries: a cursor-tracked WebGL blob (amber radial, low-freq noise displacement), and one slow scrubbed marquee of KEYWORDS at 0.05 opacity. No stacked marquees. No static radial duplicate.
-
-### 16.3 Inversion moment
-
-Exactly one section on `/` inverts to `--color-ivory` bg + `--color-ink` fg (currently: Manifesto amplifier). This is the **only** light panel on the site. Do not replicate.
-
-## 17. Dependency delta
-
-Added to locked stack:
-
-- `ogl` (~6 KB gz) — WebGL micro-lib for hero distortion field. Lazy-loaded via `next/dynamic`, SSR off.
-
-Previously forbidden `three.js` remains forbidden. `ogl` is explicitly carved out.
-
-### v2 (phase 19 — approved)
-
-Runtime:
-- `payload` — CMS core
-- `@payloadcms/next` — Next.js App Router adapter
-- `@payloadcms/db-postgres` — Postgres DB adapter
-- `@payloadcms/richtext-lexical` — lexical rich-text editor
-- `@payloadcms/plugin-seo` — per-doc SEO fields
-- `@payloadcms/plugin-redirects` — editor-managed 301/302
-- `@payloadcms/plugin-form-builder` — backs `/join`
-- `@payloadcms/plugin-search` — search index collection
-- `@payloadcms/plugin-nested-docs` — parent/child for pages
-- `@payloadcms/plugin-cloud-storage` + `@payloadcms/storage-s3` — Supabase Storage (S3-compat)
-- `graphql` — peer dep for Payload GraphQL
-
-Dev:
-- `@payloadcms/eslint-config`
-- `cross-env`
-- `tsx`
-
-Payload admin code is isolated under `src/app/(payload)/admin` route segment; public route bundle budget (SoT §11) still applies.
-
-## 18. Out-of-scope guardrail
-
-Agent **must not**:
-
-- Add new dependencies without explicit approval
-- Change palette tokens
-- Change route structure
-- Add analytics, tracking, third-party scripts
-- Replace mock CMS with live CMS
-- Touch `.env*` beyond `.env.example`
-- Run `git push`, open PRs, or merge anything
-- Modify this file silently (must be in same change & flagged in summary)
+Run the Playwright suite when UI behavior or layout changed. Documentation-only edits do not require a browser smoke unless they change generated route content.

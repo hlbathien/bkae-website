@@ -29,7 +29,25 @@ export const Posts: CollectionConfig = {
     { name: "category", type: "relationship", relationTo: "tags" },
     { name: "tags", type: "relationship", relationTo: "tags", hasMany: true },
     { name: "author", type: "relationship", relationTo: "members" },
-    { name: "body", type: "richText", localized: true },
+    {
+      name: "bodyMarkdown",
+      type: "textarea",
+      localized: true,
+      admin: {
+        description:
+          "Primary body field. Plain Markdown — supports #/##/###, **bold**, *italic*, `code`, [links](url), ![img](url), >quote, lists, --- (hr), ```fenced code```.",
+        rows: 24,
+      },
+    },
+    {
+      name: "body",
+      type: "richText",
+      localized: true,
+      admin: {
+        description:
+          "Legacy rich text block. If bodyMarkdown is filled, this is ignored at render time.",
+      },
+    },
     { name: "readingTime", type: "text", admin: { readOnly: true } },
     { name: "publishedAt", type: "date" },
   ],

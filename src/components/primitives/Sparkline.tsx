@@ -38,6 +38,7 @@ export default function Sparkline({
           gsap.set(path, { strokeDashoffset: len - obj.t });
           try {
             const pt = path.getPointAtLength(obj.t);
+            if (!Number.isFinite(pt.x) || !Number.isFinite(pt.y)) return;
             gsap.set(dot, { attr: { cx: pt.x, cy: pt.y }, opacity: 1 });
           } catch {
             // Ignore error if point can't be computed yet
@@ -49,13 +50,15 @@ export default function Sparkline({
     return () => ctx.revert();
   }, []);
 
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const stepX = 100 / (data.length - 1);
-  const pts = data.map((d, i) => {
+  const safeData = Array.isArray(data) && data.length >= 2 ? data : [0, 0];
+  const max = Math.max(...safeData);
+  const min = Math.min(...safeData);
+  const stepX = 100 / (safeData.length - 1);
+  const pts = safeData.map((d, i) => {
     const x = i * stepX;
-    const y = 30 - ((d - min) / (max - min || 1)) * 30;
-    return `${x},${y}`;
+    const range = max - min || 1;
+    const y = 30 - ((d - min) / range) * 30;
+    return `${Number.isFinite(x) ? x : 0},${Number.isFinite(y) ? y : 0}`;
   });
 
   const smoothD = pts.reduce(
@@ -82,6 +85,8 @@ export default function Sparkline({
       />
       <circle
         data-spark-dot
+        cx="0"
+        cy="0"
         r="3"
         fill="var(--color-amber-hot)"
         opacity="0"

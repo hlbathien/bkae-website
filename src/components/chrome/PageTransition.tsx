@@ -158,7 +158,7 @@ export default function PageTransition() {
     }
     
     setRouteOverlay(true);
-    const t = setTimeout(() => setRouteOverlay(false), 900);
+    const t = setTimeout(() => setRouteOverlay(false), 360);
     return () => clearTimeout(t);
   }, [pathname]);
 
@@ -245,42 +245,22 @@ export default function PageTransition() {
       {routeOverlay && (
         <div
           aria-hidden
-          className="fixed inset-0 z-[80] pointer-events-none"
-        >
-          {/* Reduced-motion fallback is handled via media query to just fade block */}
-          <div className="absolute inset-0 wipe-band bg-[var(--color-amber)] wipe-b1" />
-          <div className="absolute inset-0 wipe-band bg-[var(--color-ink)] wipe-b2" />
-          <div className="absolute inset-0 wipe-band bg-[var(--color-amber)] wipe-b3" />
-        </div>
+          className="fixed inset-0 z-[80] pointer-events-none route-fade"
+        />
       )}
       <style>{`
-        .wipe-band {
-          clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+        .route-fade {
+          background: var(--color-ink);
+          animation: routeFadeAnim 360ms ease-out forwards;
+          will-change: opacity;
         }
-        
-        .wipe-b1 { animation: wipeEnter 500ms forwards, wipeExit 400ms 500ms forwards; }
-        .wipe-b2 { animation: wipeEnter 500ms 80ms forwards, wipeExit 400ms 580ms forwards; }
-        .wipe-b3 { animation: wipeEnter 500ms 160ms forwards, wipeExit 400ms 660ms forwards; }
-
-        @keyframes wipeEnter {
-          0% { clip-path: polygon(0 100%, 0 100%, -50% 100%, -50% 100%); }
-          100% { clip-path: polygon(0 -100%, 200% -100%, 200% 100%, 0 100%); }
+        @keyframes routeFadeAnim {
+          0%   { opacity: 0; }
+          35%  { opacity: 0.55; }
+          100% { opacity: 0; }
         }
-        
-        @keyframes wipeExit {
-          0% { clip-path: polygon(0 -100%, 200% -100%, 200% 100%, 0 100%); }
-          100% { clip-path: polygon(100% 0, 100% 0, 250% 0, 250% 0); }
-        }
-
         @media (prefers-reduced-motion: reduce) {
-          .wipe-b1 { animation: routeFade 60ms forwards; }
-          .wipe-b2, .wipe-b3 { display: none; }
-        }
-
-        @keyframes routeFade {
-          0% { opacity: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-          40% { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-          100% { opacity: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+          .route-fade { animation: none; opacity: 0; }
         }
       `}</style>
     </>

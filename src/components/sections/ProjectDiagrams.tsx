@@ -201,7 +201,7 @@ export function LumenDiagram() {
       ))}
 
       {/* Pulse */}
-      <circle id="lumen-pulse" r="4" fill="var(--color-amber-hot)">
+      <circle id="lumen-pulse" cx="90" cy="300" r="4" fill="var(--color-amber-hot)">
         <animate attributeName="opacity" values="0.2;1;0.2" dur="1.4s" repeatCount="indefinite" />
       </circle>
 

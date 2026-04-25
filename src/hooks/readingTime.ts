@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from "payload";
+import { stripMd } from "../lib/markdown";
 
 const WORDS_PER_MIN = 220;
 
@@ -11,8 +12,10 @@ function lexicalToText(node: unknown): string {
 }
 
 export const computeReadingTime: CollectionBeforeChangeHook = ({ data }) => {
-  const root = (data?.body as { root?: unknown })?.root;
-  const text = lexicalToText(root);
+  const md = typeof data?.bodyMarkdown === "string" ? data.bodyMarkdown : "";
+  const text = md
+    ? stripMd(md)
+    : lexicalToText((data?.body as { root?: unknown })?.root);
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   const minutes = Math.max(1, Math.round(words / WORDS_PER_MIN));
   return { ...data, readingTime: `${minutes} min` };

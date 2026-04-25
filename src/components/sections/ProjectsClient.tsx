@@ -3,6 +3,7 @@ import Link from "next/link";
 import Frame from "@/components/primitives/Frame";
 import Tag from "@/components/primitives/Tag";
 import CountUp from "@/components/motion/CountUp";
+import RevealText from "@/components/motion/RevealText";
 import { useEffect, useRef } from "react";
 import { ensureGsap } from "@/lib/gsap";
 import type { Project } from "@/lib/cms";
@@ -152,40 +153,22 @@ function ProjectScene({ p, idx }: { p: Project; idx: number }) {
 }
 
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !headingRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const { gsap } = ensureGsap();
-    const ctx = gsap.context(() => {
-      gsap.from(headingRef.current, {
-        y: 48,
-        opacity: 0,
-        duration: 1.0,
-        ease: "expo.out",
-        scrollTrigger: { trigger: headingRef.current, start: "top 85%" },
-      });
-    });
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section id="projects" data-section="projects" className="relative border-t border-[var(--color-ink3)]">
       <Frame>
         <header className="flex items-end justify-between pt-[var(--space-section-sm)] pb-[var(--space-block)]">
           <div>
             <p className="eyebrow mb-3">Evidence · 02</p>
-            <h2 ref={headingRef} className="font-display h-display-l text-[var(--color-ivory)]">
-              Two systems.
+            <h2 className="font-display h-display-l text-[var(--color-ivory)]">
+              <RevealText splitBy="word">Two systems.</RevealText>
               <br />
-              <span className="font-serif-italic text-[var(--color-amber)]">Both shipped.</span>
+              <RevealText splitBy="word" delay={0.15} className="font-serif-italic text-[var(--color-amber)]">Both shipped.</RevealText>
             </h2>
           </div>
           <Link
             href="/projects"
             data-cursor="link"
-            className="bracket-link hidden text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
+            className="bracket-link hidden whitespace-nowrap shrink-0 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
           >
             All projects →
           </Link>

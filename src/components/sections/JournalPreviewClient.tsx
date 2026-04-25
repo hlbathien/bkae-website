@@ -20,6 +20,7 @@ function CascadeTitle({ text, className, style }: { text: string; className?: st
 }
 
 import Frame from "@/components/primitives/Frame";
+import RevealText from "@/components/motion/RevealText";
 import { useEffect, useRef } from "react";
 import { ensureGsap } from "@/lib/gsap";
 
@@ -56,12 +57,12 @@ export default function JournalPreviewClient({ posts }: { posts: Post[] }) {
           <div>
             <p className="eyebrow mb-3">Journal · 05</p>
             <h2 data-journal-heading className="font-display h-display-l text-[var(--color-ivory)]">
-              Field notes from the discipline.
+              <RevealText splitBy="word">Field notes from the discipline.</RevealText>
             </h2>
           </div>
           <Link
             href="/journal"
-            className="bracket-link hidden text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
+            className="bracket-link hidden whitespace-nowrap shrink-0 text-[var(--fs-eyebrow)] uppercase tracking-[var(--tr-wide)] text-[var(--color-ivory)] hover:text-[var(--color-amber)] md:inline-block"
           >
             All posts →
           </Link>

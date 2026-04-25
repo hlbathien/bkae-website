@@ -1,107 +1,203 @@
-We are 2 first-year students with extreme vibe coding abilities and experiences on building apps leveraging AI. We built a multimodal journal-generation system that fused photos, voice/text context, persona profiles, recent journals, and long-term memory into an asynchronous tags → writer → memory pipeline that won 2nd place of best use of Qwen at Vietnam's largest Hackathon. We recently built a patient-focused system that converts lab reports pdfs into traceable clinical summaries and clinician handoffs using a deterministic, contract-based pipeline, while confining Qwen to tightly bounded explanation and follow-up chat so the product can surface uncertainty, refuse unsupported conclusions, and stay resilient in real-world use. We want to start a club at Ho Chi Minh City's largest and best Engineering School, HCMUT for spreading Vibe Coding under the professional name of Agentic Engineering with the future goal of collaborating with OpenAI. In the near term, we want to publish impactful open-source apps helping HCMUT students, gain credibility before organizing workshops, recruiting members, and propagate vibe coding. I want to build a CMS website with a artistic and award-winning landing page for the club to post our projects, advertise, convert, CTA, etc.
-This is a genuinely interesting positioning challenge because you carry a productive tension at your core — let me unpack it fully before getting to color and design.
+# Agentic Engineering Identity
+
+Agentic Engineering is an HCMUT student club for builders who treat AI-native software as an engineering discipline, not a prompt trick.
+
+We are founded by two first-year students at Ho Chi Minh City University of Technology. Our proof point is shipped work: a multimodal journal-generation system that won 2nd place for Best Use of Qwen at GenAI Hackathon Vietnam 2025, and a patient-focused clinical handoff system built around deterministic extraction, traceable claims, bounded model use, and explicit refusal of unsupported conclusions.
+
+## Thesis
+
+AI systems become reliable when the model is bounded by contracts, deterministic pipelines, evaluation, traceability, and product judgment. We move fast, but the speed is in service of shipped systems that can be inspected, repeated, and trusted.
+
+## Position
+
+Agentic Engineering holds two ideas together:
+
+- Vibe coding gives builders speed, taste, and iteration power.
+- Engineering discipline turns that speed into systems that survive real use.
+
+The club exists to make that synthesis normal at HCMUT: fast builders who can also reason about constraints, interfaces, data flow, safety boundaries, and deployment.
+
+## Audience
+
+- HCMUT students who want to ship useful AI-native products.
+- Faculty and institutional partners who need the work to be serious and inspectable.
+- External collaborators, sponsors, and frontier AI organizations looking for Vietnam's next generation of practical AI engineers.
+
+## Near-Term Goals
+
+- Recruit a founding cohort through the website.
+- Publish open-source apps useful to HCMUT students.
+- Document the engineering discipline through projects, essays, events, and public notes.
+- Build credibility before workshops, sponsorship, and deeper external collaboration.
+
+## Voice
+
+- Institutional, not startup.
+- Precise, not clever.
+- Fast, but measured.
+- Ambitious, without hype.
+- Technical enough to earn trust.
+
+Core line: `Bounded LLMs. Contract-based pipelines. Shipped systems.`
+
+## Journie — Multimodal AI Journaling System
+
+**Stack:** React 18, NestJS 10, Supabase, Qwen2.5-VL, Qwen-Plus, GPT-4o  
+**Versions:** Vite 5, Zustand 4, Framer Motion 12.38, TypeScript 5, Vitest 3.2.4, Playwright 1.57  
+**Award:** 2nd Place — Best Use of Qwen (LotusHacks 2026)  
+**Deployment:** Vercel (serverless, maxDuration 60s), pnpm workspaces monorepo
+
+### What It Does
+
+Multimodal journaling platform: user captures images + voice + text daily → staged AI pipeline transforms inputs into personalized narrative journal entries with long-term memory.
+
+### Pipeline Architecture (8 Stages)
+
+Entry point: `POST /journal/generate` → `202 Accepted` immediately → async backend job
+
+| Stage | What Happens |
+|-------|-------------|
+| 0 | Rate limit check: in-memory map, 3 attempts/user/date/day |
+| 1 | Upsert `journal_entries` row with `status='generating'` |
+| 2 | Parallel context fetch: `Promise.all([persona, moments, recentJournals, memories, editDiffs])` |
+| 3 | Sign photo URLs (1-hour Supabase signed URLs, fallback to stored `photo_url`) |
+| 4 | **TAGS** — Qwen2.5 Flash: ≤5 tags per moment `{tag, category, confidence: 0–1}`, 10 categories |
+| 5 | **WRITER** — Qwen Plus: temp=0.8, max_tokens=2000, multimodal input (detail='low'), structured output |
+| 6 | Persist draft: `content`, `daily_achievement`, `best_photo_url`, `status='draft'` |
+| 7 | Insert `daily_insights` (JSONB) |
+| 8 | **MEMORY** (non-blocking): gating prompt (Qwen Plus, temp=0.2) → dedup → evict if >200 cap |
+
+### AI Model Routing (Dual-Client Architecture)
+
+```
+DashScope key present:
+  tags task     → Qwen2.5-VL Flash (qwen2.5-vl-3b-instruct, configurable)
+  writer task   → Qwen Plus (qwen-plus-latest, configurable)
+  memory task   → Qwen Plus
+
+No DashScope (or error-disabled):
+  all tasks     → GPT-4o via OpenAI SDK 4
+
+Both unavailable:
+  deterministic fallback generation (no hard crash)
+```
+
+**Writer output format:**
+- Markdown narrative (200–500 words)
+- `<daily_achievement>` (≤10 words)
+- `<best_photo>` (photo ID)
+- `<Insights>` (CONFIRMED/UNCONFIRMED, hidden from user)
+
+### Memory System
+
+- Table: `user_memories` — `{category, fact (max 500 chars), confidence (0–1), source_date, expires_at}`
+- Unique index on `(user_id, md5(fact))` — automatic deduplication
+- Cap: 200 per user; eviction = lowest-confidence deleted first
+- Categories: preference, relationship, routine, identity, voice
+- Injected into Writer's system prompt on every generation
+- Pipeline: Writer produces insights → memory gating filters `confirmed=true` → Qwen Plus evaluates → dedup insert → evict
+
+### Backend Capabilities
+
+- NestJS 10 REST API, all routes auth-guarded (Supabase JWT)
+- 13 endpoints: persona (2), moments (5), transcribe (1), journal (4), health (1)
+- File upload: 10 MB max, MIME: jpeg/png/webp/heic, cap 10 images/generation (free tier)
+- API timeout: 30s (AbortController on client)
+- Vercel API handler: `api/[[...route]].ts` (NestJS wrapped in Express)
+
+### Frontend System Design
+
+- Route tree: `/auth` → `/auth/resolver` → `/onboarding` (5-step) → `/home` → `/timeline` → `/journal/:date` → `/journals`
+- Zustand global state: `userId, displayName, isOnline, todayMomentsDate, todayMoments` (date-validated cache), `currentAura` (hex from last mood)
+- Polling: 2s interval, 90s timeout, max 3 consecutive errors → stable fallback content
+- Session retry: 20 attempts, 150ms delay
+- Vite code splitting: framework / motion / supabase / markdown / ui-vendor chunks
+- Animations: Framer Motion 12 LazyMotion, respects `prefers-reduced-motion`
+- Offline-aware: checks `isOnline` before destructive actions
+- Camera-first UX: `getUserMedia` hero, square JPEG capture
+
+### Testing Infrastructure
+
+- Unit/component: Vitest 3.2.4 + React Testing Library (jsdom)
+- E2E: Playwright 1.57 — 4 projects: mock-mobile, mock-desktop-chromium, mock-desktop-firefox, integration-chromium
+
+### Key Engineering Decisions
+
+- Async pipeline + optimistic nav → no blocking on generation (can take 10–30s)
+- Multi-model routing → no single LLM dependency; graceful degradation to deterministic
+- Separation: Supabase handles auth only; all app data through NestJS API layer
+- Non-blocking memory stage → generation never fails due to memory processing
+- Rate limiting in-memory (per process) — acknowledged tradeoff: resets on restart
+
+### Impact Signals
+
+- Award-winning (hackathon top placement, competitive Qwen use case)
+- Full production-grade system: auth, file storage, async jobs, polling recovery, fallback states
+- Demonstrates multimodal context fusion + long-term personalization in single product
+- Clean separation of concerns across 5 layers: auth / storage / API / AI / client
 
 ---
+## Elfie Lab Analyzer — Clinical Lab Report Processing System
 
-## Strategic Position Analysis
+**Stack:** Python 3.11, FastAPI 0.115+, React 19 (Vite), PostgreSQL 15  
+**Versions:** SQLAlchemy 2.0+, asyncpg, Pydantic 2.7+, pdfplumber, PyMuPDF, magic-pdf (Mineru OCR)
+**Achievements:** Finalist (Top 7) at Firstever Qwen AI Build Day's Healthcare Track
 
-### The Tension That Defines You
+### What It Does
 
-You are two things simultaneously, and the design must hold both without collapsing either:
+Automated clinical laboratory report processing: PDF ingestion → standardized analyte extraction → LOINC mapping → unit normalization → clinical rule evaluation → severity classification → actionable outputs with full lineage tracking.
 
-| Vibe Coding               | Agentic Engineering                |
-| ------------------------- | ---------------------------------- |
-| Fast, intuitive, creative | Rigorous, contract-based, reliable |
-| Hackathon energy          | Clinical-grade pipeline thinking   |
-| First-year audacity       | Production standards               |
-| Irreverent                | Institutional                      |
+### 11-Stage Deterministic Pipeline
 
-Most clubs pick one lane. Your competitive advantage is that you've already _proven_ both — a hackathon win built on a deterministic pipeline with bounded LLM behavior is not a contradiction, it's a thesis. **The design must embody that synthesis.**
+| Stage | Name | What Happens |
+|-------|------|-------------|
+| 1 | Extract | PDF → raw analytes via Mineru OCR / pdfplumber / PyMuPDF |
+| 2 | Observe | Raw text → structured observations |
+| 3 | Map | Deterministic LOINC alias matching (LRU cache: 4096) |
+| 4 | Convert | UCUM unit canonicalization + mass↔molar conversion |
+| 5 | Panel Group | Analytes grouped into clinical panels |
+| 6 | Fire Rules | JSON-configured threshold evaluation |
+| 7 | Severity | Severity gradient assignment |
+| 8 | NextStep | Clinical action recommendation |
+| 9–10 | Render | Report artifact generation |
+| 11 | Persist Lineage | Full reproducibility record |
 
-### Who You're Talking To (Three Audiences Simultaneously)
+### Core Services
 
-**1. HCMUT students** — Your near-term conversion target. They need to feel: _"These people are ahead of me and I want to be in that room."_ Not intimidating, but magnetic.
+**AnalyteResolver:** Deterministic LOINC alias matching, LRU cache (4096 entries), no fuzzy matching — correctness over recall
 
-**2. Faculty / institutional stakeholders** — For credibility. They need to feel: _"This is serious. This is not a meme club."_
+**UcumEngine:** Unit canonicalization + mass↔molar conversion (e.g. glucose MW: 180.156 g/mol)
 
-**3. External professionals / OpenAI, sponsors** — Long game. They need to feel: _"This is the institution producing Vietnam's frontier engineers."_
+**RuleEngine:** Threshold evaluation with severity gradients:
+- 1.0–1.2× ref → Severity 1 (mild)
+- 2.0×+ ref → Severity 4 (critical)
+- JSON-configured — all clinical logic is externalized, not hardcoded
 
-One design system must speak to all three without pandering to any.
+**SeverityPolicyEngine:**
+- Age < 18 → SX severity override
+- Critical value gating: requires explicit sign-off before proceeding
 
-### What Emotion You Are Invoking
+**LineageLogger:** Records source checksum, all service versions, build commit — full reproducibility per report
 
-You are not invoking **excitement about AI**. Everyone does that. You are invoking:
+### AI Usage (Deliberate Constraint)
 
-- **Inevitability** — This is where engineering is going. They're already there.
-- **Precision** — Not clever, not flashy. Correct. Reliable. Measurable.
-- **Controlled velocity** — Fast but not reckless. Speed with judgment.
-- **Quiet authority** — The confidence of people who've shipped real things.
+Qwen API (DashScope) used **post-pipeline only**, for narrative generation. All clinical decisions (LOINC mapping, unit conversion, rule firing, severity classification) are deterministic and configuration-driven. No ML in the decision path — correctness and auditability over flexibility.
 
-The feeling should be closer to a **technical journal from the future** than a startup landing page.
+### Performance
 
----
+| Stage | Latency |
+|-------|---------|
+| Extract (OCR) | 200–500ms/page |
+| Normalize | 50–150ms |
+| Rules | 20–80ms |
 
-## Color Palette Direction
+### Database (12 ORM Tables)
 
-### The Wrong Directions to Avoid
+Full lineage tracking: source documents, extracted analytes, LOINC mappings, conversions, rule evaluations, severity assignments, rendered artifacts, audit log
 
-- **Purple-on-white AI gradients** → signals "we read a Medium post about AI design"
-- **Neon green hacker aesthetic** → signals "CTF club, not engineering institution"
-- **Corporate navy blue** → signals "we want to be a consulting firm"
-- **Pastel/approachable** → signals weakness for an institution claiming rigor
+### Impact Signals
 
-### The Right Direction: **Obsidian + Signal**
-
-A dark, near-black foundation with a single high-luminance accent used with surgical restraint.Now let me build the full analysis with a visual palette demonstration.---
-
-## The Full Design Brief
-
-### The Core Tension You Must Weaponize
-
-Your story has a built-in paradox: **vibe coding** (fast, intuitive, almost reckless) + **engineering discipline** (contract-based, bounded, reliable). Most clubs would sand this down into something safe. Don't. That tension _is_ the brand. The design needs to feel like a precision instrument built at high speed — like a finely machined object with fingerprints still visible on it.
-
----
-
-### Color Palette: Obsidian + Signal
-
-**Why amber, not any other accent color:**
-Amber is the color of judgment — warning lights, editor highlights, the cursor blinking in a terminal. It sits between the cold blue of pure tech and the red of danger. It's warm enough to signal _human intelligence_ in the loop, precise enough to signal _serious craft_. For a Vietnamese engineering institution, it also carries a cultural resonance (gold, craft, earned status) without being culturally literal. Every other AI-club accent color (cyan, neon, electric blue) has been burned through. Amber owns a lane.
-
-**Why obsidian, not white:**
-White-background sites signal "startup landing page." Your positioning is _institutional_ — more MIT architecture lab than Y Combinator demo day. Dark grounds the authority. It also makes the amber accent hit with the visual impact of a single lamp in a dark room — undeniable, focal, precise.
-
----
-
-### Typography Direction
-
-Three-font hierarchy, each doing distinct work:
-
-- **Syne 800** for display/headlines — ultrawide, almost architectural. It feels like it was designed for institutions that build things. Nothing fragile about it.
-- **Instrument Serif italic** as your accent voice — for pull quotes, taglines, the moment you need to say something with _feeling_ rather than information. The serif/italic contrast against the grotesque display creates editorial tension.
-- **DM Mono** for body — not because you're a "code" club (avoid that cliché) but because monospace in this context reads as _precision, not decoration_. It says: we measure things. Every character earns its space.
-
----
-
-### Key Design Aspects for the Website
-
-**1. The Landing Page as an Argument, Not a Brochure**
-You're not selling features. You're making a claim: _the workflow changed, and this institution exists because of that._ The hero section should state your thesis as a single, typographically overwhelming statement — then prove it with your projects below.
-
-**2. Project Cards as Primary Credibility**
-Your hackathon win and the clinical pipeline are not "portfolio items" — they're _evidence_. Each project card needs: the engineering decision that was hard, the constraint you operated under, the outcome. Not screenshots and tags.
-
-**3. Motion as Precision, Not Spectacle**
-Avoid particle effects, floating gradients, mouse-trail glows — those signal "we watched a WebGL tutorial." Instead: staggered text reveals on scroll, amber cursor accents, numbers counting up when stats enter view. Everything should feel like a process running, not a show playing.
-
-**4. Negative Space as Conviction**
-Overcrowded landing pages signal insecurity — filling every pixel because you're afraid of being ignored. You have two real projects. Give them room. White (dark) space on an obsidian background reads as _confidence in what's there._
-
-**5. The CTA Hierarchy**
-Three conversion paths in priority order: (1) **View open-source projects** → your near-term goal is credibility through shipped work, (2) **Read the engineering blog** → positions you as the discipline-definers, (3) **Join the waitlist** → for when you're ready to recruit. Don't mix them visually; hierarchy is everything.
-
-**6. Responsive Without Compromise**
-HCMUT students are predominantly on mobile. The typographic system (Syne 800 at large sizes, DM Mono body) must be tested at 375px. Syne condensed beautifully at small widths — it's one of the reasons it's the right call here.
-
----
-
-Want me to build the actual landing page now with this system? I can produce a full HTML artifact with the hero section, project cards, and CTA flows.
+- Production-appropriate safety design: deterministic clinical logic, no model in decision path
+- Full lineage/reproducibility tracking — auditable for regulated environments
+- Demonstrates systems thinking: separation of extraction (uncertain) from reasoning (deterministic)
+- LRU caching, async FastAPI, streaming PDF processing — performance-conscious implementation

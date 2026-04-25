@@ -1,4 +1,5 @@
 import React from "react";
+import LogoMark from "@/components/primitives/LogoMark";
 
 export default function Logo() {
   return (
@@ -15,13 +16,12 @@ export default function Logo() {
       <span
         aria-hidden
         style={{
-          display: "inline-block",
-          width: 14,
-          height: 14,
-          background: "#D4870A",
-          borderRadius: 2,
+          display: "inline-flex",
+          color: "#D4870A",
         }}
-      />
+      >
+        <LogoMark size={14} />
+      </span>
       <strong style={{ fontWeight: 600 }}>
         agentic engineering<span style={{ color: "#D4870A" }}>.</span>
       </strong>

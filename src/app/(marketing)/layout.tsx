@@ -7,7 +7,6 @@ import SmoothScroll from "@/components/chrome/SmoothScroll";
 import ScrollRail from "@/components/chrome/ScrollRail";
 import PageTransition from "@/components/chrome/PageTransition";
 import AudioToggle from "@/components/chrome/AudioToggle";
-import LiveFavicon from "@/components/chrome/LiveFavicon";
 import DraftBanner from "@/components/chrome/DraftBanner";
 import { LD, organizationLD, websiteLD } from "@/lib/jsonld";
 import { syne, instrumentSerif, dmMono } from "@/lib/fonts";
@@ -18,21 +17,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       lang="en"
       className={`${syne.variable} ${instrumentSerif.variable} ${dmMono.variable} bg-[var(--color-ink)] text-[var(--color-ivory)]`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-/**
- *
- *   AGENTIC ENGINEERING · HCMUT
- *   BOUNDED LLMS · CONTRACT-BASED PIPELINES · SHIPPED SYSTEMS
- *   v1.0.0-2026-AE
- *
- */
-`,
-          }}
-        />
-      </head>
       <body className="antialiased">
         <LD data={organizationLD()} />
         <LD data={websiteLD()} />
@@ -65,7 +49,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <GridOverlay />
           <ScrollRail />
           <AudioToggle />
-          <LiveFavicon />
           <Cursor />
           <main id="main">{children}</main>
           <Footer />

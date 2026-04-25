@@ -3,6 +3,7 @@ import { withPayload } from "@payloadcms/next/withPayload";
 
 const config: NextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ["127.0.0.1"],
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -17,6 +18,8 @@ const config: NextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
   async headers() {
+    if (process.env.NODE_ENV !== "production") return [];
+
     return [
       {
         source: "/_next/static/:path*",

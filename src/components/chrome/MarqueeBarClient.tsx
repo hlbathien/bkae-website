@@ -11,7 +11,7 @@ export default function MarqueeBarClient({ announcements }: { announcements: Ann
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    document.documentElement.style.setProperty("--marquee-height", dismissed ? "0px" : "36px");
+    document.documentElement.style.setProperty("--marquee-height", dismissed ? "0px" : "2.25rem");
     return () => {
       document.documentElement.style.setProperty("--marquee-height", "0px");
     };

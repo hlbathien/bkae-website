@@ -34,10 +34,10 @@ export async function GET() {
     parts.push(
       `### ${p.title}`,
       `URL: ${SITE}/projects/${p.slug}`,
-      `Problem: ${p.problem}`,
-      `Constraint: ${p.constraint}`,
-      `Outcome: ${p.outcome}`,
-      `Stack: ${p.stack.join(", ")}`,
+      `Problem: ${p.problem ?? ""}`,
+      `Constraint: ${p.constraint ?? ""}`,
+      `Outcome: ${p.outcome ?? ""}`,
+      `Stack: ${(p.stack ?? []).join(", ")}`,
       ``,
     );
   }
@@ -47,8 +47,8 @@ export async function GET() {
     parts.push(
       `### ${p.title}`,
       `URL: ${SITE}/journal/${p.slug}`,
-      `Category: ${p.category} · Published: ${p.publishedAt} · ${p.readingTime}`,
-      p.excerpt,
+      `Category: ${p.category ?? ""} · Published: ${p.publishedAt ?? ""} · ${p.readingTime ?? ""}`,
+      p.excerpt ?? "",
       ``,
     );
   }

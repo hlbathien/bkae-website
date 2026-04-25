@@ -1,103 +1,82 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Repository guidance for Claude Code and compatible coding agents.
 
 ## Project
 
-Marketing + CMS site for **Inference** (alias `bkae-website`), an Agentic Engineering student club at HCMUT. Dark, editorial landing page + mock-CMS-driven project/journal/manifesto/join routes. English-only, dark-only, v1.
+`C:\bkae-website` is the Agentic Engineering website: a Next.js 16 marketing site, Payload CMS admin, and machine-readable content surface for an HCMUT student club.
+
+Current documentation authority:
+
+1. Human instruction
+2. `docs/SOURCE_OF_TRUTH.md`
+3. Current source code
+4. `README.md`
+5. `docs/WORKFLOW_RULES.md`
+
+Historical phase plans and reports are intentionally gone. Do not resurrect phase sequencing as an authority model.
 
 ## Commands
 
-Package manager: **pnpm**. Node 20+.
+Use `pnpm`.
 
 ```bash
 pnpm install
-pnpm dev                  # next dev (turbopack)
-pnpm build                # next build
-pnpm start                # next start
-pnpm lint                 # eslint src
-pnpm lint:fix             # eslint src --fix
-pnpm format               # prettier --write .
-pnpm typecheck            # tsc --noEmit
+pnpm dev
+pnpm dev:admin
+pnpm build
+pnpm start
+pnpm lint
+pnpm lint:fix
+pnpm format
+pnpm typecheck
+pnpm payload
+pnpm generate:types
+pnpm generate:importmap
+pnpm migrate
+pnpm migrate:create
+pnpm seed
+pnpm exec playwright test
+pnpm exec tsx --test tests/*.test.ts
 ```
 
-No test runner configured. Acceptance gates are `pnpm typecheck` + `pnpm build` + `pnpm lint` clean (see `docs/WORKFLOW_RULES.md` R8).
+Local services:
 
-## Authority Order
-
-Agent must obey, highest → lowest:
-
-1. Explicit human prompt
-2. `docs/SOURCE_OF_TRUTH.md` (canonical spec; diverging code = bug)
-3. `docs/BUILDING_PLAN.md` (phase sequence 0–7; do not skip/reorder)
-4. `docs/WORKFLOW_RULES.md` (R1–R14 guardrails)
-5. Existing code
-
-Conflict between human prompt and SoT → ask, do not proceed.
-
-## Architecture
-
-**Stack (locked — no swaps without approval):** Next.js 16 App Router, React 19, TypeScript strict, Tailwind v4 beta via `@tailwindcss/postcss` + `@theme` tokens, GSAP 3 + ScrollTrigger, Lenis smooth scroll wired to GSAP ticker, `react-hook-form` + `zod` (join form only), `lucide-react`, `clsx`. Path alias `@/*` → `src/*`.
-
-**Forbidden libs:** styled-components, emotion, framer-motion, locomotive-scroll, three.js, jQuery.
-
-**Routes (v1 complete set):** `/`, `/projects`, `/projects/[slug]`, `/journal`, `/journal/[slug]`, `/manifesto`, `/join`, plus `POST /api/join` (stub). `robots.ts` + `sitemap.ts` at app root.
-
-**Directory contract** (update SoT §7 before adding top-level dirs):
-
-```
-src/
-  app/            routes + layout.tsx + globals.css + robots.ts + sitemap.ts + api/join/
-  components/
-    chrome/       SmoothScroll, Header, MarqueeBar, GridOverlay, Cursor, Footer
-    motion/       RevealText, CountUp, MagneticBtn, MarqueeRow  (GSAP effects)
-    primitives/   Frame, Tag, Button
-    sections/     Hero, Manifesto, Projects, Process, Stats, JournalPreview, CTABands
-  lib/            cms.ts, gsap.ts, fonts.ts, utils.ts
-docs/             SOURCE_OF_TRUTH.md, BUILDING_PLAN.md, WORKFLOW_RULES.md, COPY.md, reports/
+```bash
+docker compose up -d
 ```
 
-**Landing order (`/`):** Hero → Manifesto pull-quote → Projects (ScrollTrigger-pinned) → Process (horizontal scroll-jack; vertical on mobile) → Stats → JournalPreview → CTABands. Don't reorder without SoT update.
+Postgres and Adminer bind to `127.0.0.1`.
 
-**CMS:** `src/lib/cms.ts` is mock data source. Types (`Project`, `Post`, `Member`, `Announcement`) are contract — match exactly. Required project slugs v1: `lumen-journal`, `atlas-clinical`. Payload CMS integration is post-v1.
+## Architecture Notes
 
-**Dynamic routes** use async `params` (Next 15+ pattern) and export `generateStaticParams` + `generateMetadata`.
+- `src/app/layout.tsx` is bare and must stay bare.
+- `src/app/(marketing)/layout.tsx` owns the public `<html>`, fonts, JSON-LD, DraftBanner, SmoothScroll, PageTransition, MarqueeBar, Header, GridOverlay, ScrollRail, AudioToggle, Cursor, and Footer.
+- `src/app/(payload)/layout.tsx` owns the Payload admin shell.
+- `src/lib/cms.ts` contains public fixture contracts and fallback data only.
+- `src/lib/cms-server.ts` is the server-only Payload facade and normalization layer.
+- `payload.config.ts` defines collections, globals, plugins, admin branding, Postgres, and generated type output.
 
-## Design Tokens (enforced)
+See `docs/SOURCE_OF_TRUTH.md` for the route map, CMS collections/globals, env vars, security details, and verification commands.
 
-Colors only via CSS vars in `src/app/globals.css @theme` — no raw hex in components. Palette: `--color-ink`, `--color-ink2`, `--color-ink3`, `--color-amber` (#D4870A primary), `--color-amber-hot`, `--color-amber-pale`, `--color-ivory`, `--color-ivory2`, `--color-steel`, `--color-steel-light`.
+## Guardrails
 
-Fonts: only `.font-display` (Syne 800), `.font-serif-italic` (Instrument Serif italic), default DM Mono body. No new families. Loaded via `src/lib/fonts.ts` + Google Fonts `@import`.
+- Do not add runtime dependencies without explicit approval.
+- Do not put Payload or server-only imports in client components.
+- Do not collapse the marketing and Payload route groups.
+- Do not hand-edit `src/payload-types.ts` unless explicitly asked.
+- Do not edit `.env.local` or other secret files unless explicitly asked.
+- Use design tokens from `src/app/globals.css`.
+- Keep motion compatible with `prefers-reduced-motion`.
+- Run fresh verification before claiming work is complete.
 
-Spacing: Tailwind scale only. No magic px except established typographic `clamp()` ranges.
+## Known Placeholders
 
-## Motion Contract
+These are intentional until production accounts/domains are assigned:
 
-- GSAP + Lenis only. No CSS transitions > 300ms on layout props.
-- Every animating `useEffect` MUST start with:
-  ```ts
-  if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  ```
-- Default ease: `expo.out` entrances, `power3.inOut` scrubs.
-- No motion may delay critical CTA interaction > 200ms.
-- `Cursor` hidden on `(hover: none)`.
+- `https://inference.club`
+- `https://github.com/inference-club/*`
+- `hello@inference.club`
+- `GITHUB_ORG=inference-club`
 
-## Performance Budgets
-
-LCP ≤ 2.5s (mobile slow 4G), CLS ≤ 0.05, INP ≤ 200ms, landing JS ≤ 220 KB gz, total landing transfer ≤ 900 KB. Verify via `next build` route summary + Lighthouse mobile.
-
-## Guardrails (R3, R4, R8, R14 — excerpt)
-
-- **No new runtime deps** without explicit approval. If blocked, log to `docs/BLOCKED.md` and halt. Devtime tooling only if a BUILDING_PLAN phase requires it.
-- Never `git push`, `git reset --hard`, `git rebase`, `git checkout -- .`, `git clean`, amend, or `--no-verify`.
-- Never `git add .` / `-A` — stage explicit paths.
-- One commit per completed phase. Message: `phase(N): <slug> — <one-line>`.
-- Never touch `.env*` beyond `.env.example`.
-- Never delete files outside `node_modules/`, `.next/`, `docs/reports/`.
-- Phase N+1 blocked until `docs/reports/phase-N.md` records passing acceptance.
-- State invariants (must hold start + end of task): tsc 0, next build 0, no stray untracked files, no `lorem`/`TODO!!`/`FIXME!!`/`XXX`/`HACK` in `src/`, `cms.ts` types unchanged unless SoT updated.
-- Resume after restart by reading `docs/reports/` to find current phase.
-
-## RTK (user's global preference)
-
-Prefix shell invocations with `rtk` when available (e.g. `rtk pnpm build`, `rtk git status`, `rtk next build`) for token-compressed output. Passthrough-safe on unknown commands.
+They are not user-visible brand names.

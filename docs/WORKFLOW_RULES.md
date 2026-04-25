@@ -1,165 +1,108 @@
-# WORKFLOW RULES — Autopilot Coding Agent
+# Workflow Rules
 
-> Strict guardrails. Violations = stop work, surface to human. No exceptions.
+These are the active repository rules. Historical phase plans and per-phase report requirements have been removed; work should now follow the current code and `docs/SOURCE_OF_TRUTH.md`.
 
-Audience: GLM-5 (or equivalent) coding agent running unattended on `C:\bkae-website\`.
+## Authority Order
 
-Authority order (highest → lowest):
-
-1. Explicit human instruction in current prompt
+1. Explicit human instruction in the current task
 2. `docs/SOURCE_OF_TRUTH.md`
-3. `docs/BUILDING_PLAN.md`
-4. This file
-5. Existing code
+3. Current source code
+4. `README.md`
+5. Agent handoff docs (`CLAUDE.md`, `GEMINI.md`)
 
-If conflict between (2) and code → fix code. Conflict between (1) and (2) → ask human, do not proceed.
+If source code and `SOURCE_OF_TRUTH.md` conflict, update the one that is wrong in the same change. If a human instruction conflicts with a safety rule or production secret handling, stop and ask.
 
----
+## Read Before Write
 
-## R1. Scope discipline
+- Read the governing source files before editing them.
+- Search for existing helpers before adding new utilities.
+- Prefer existing design tokens, components, hooks, and CMS facades.
+- Keep edits scoped to the requested change.
+- Do not hand-edit generated files such as `src/payload-types.ts` unless the task is explicitly about generated output.
 
-- Work **one phase at a time** in the order defined in `BUILDING_PLAN.md`.
-- Do **not** start phase N+1 until phase N acceptance criteria are recorded in `docs/reports/phase-N.md`.
-- Do **not** invent phases, refactors, redesigns, or "while I'm here" cleanups.
-- Out-of-scope idea? Append to `docs/BACKLOG.md` w/ one-line rationale. Continue current phase.
+## Dependencies
 
-## R2. Read-before-write
+- Do not add runtime dependencies without explicit approval.
+- Prefer existing stack choices: Next, React, Tailwind tokens, GSAP, Lenis, Payload, Zod, React Hook Form.
+- `plugin-redirects` and S3 storage packages are installed but not fully wired as active features.
 
-- Before editing a file, read it. Before creating a file, glob the dir.
-- Before adding a symbol, grep for existing definitions.
-- Never duplicate utility code. Reuse from `src/lib/` and `src/components/primitives/`.
+## Commands
 
-## R3. Dependency lock
+Allowed routine commands:
 
-- **No new runtime dependencies** without explicit human approval. Devtime tooling (eslint plugins, prettier) only if `BUILDING_PLAN.md` phase requires it.
-- If a task seems to need a new dep, stop. Open `docs/BLOCKED.md` w/ entry: phase, task, proposed dep, justification, alternative considered.
-
-## R4. Commands you may run unattended
-
-Allowed:
-
-- `pnpm install`, `pnpm add -D <devdep>` (only if R3 satisfied)
-- `pnpm exec tsc --noEmit`
-- `pnpm exec next build`
-- `pnpm exec next dev` (background; kill before phase end)
-- `pnpm lint`, `pnpm format`, `pnpm typecheck`
-- `git status`, `git diff`, `git log`, `git add <specific paths>`, `git commit`
-- `rtk` prefixed equivalents of all the above
-
-Forbidden without explicit per-call human approval:
-
-- `git push`, `git reset --hard`, `git rebase`, `git checkout -- .`, `git clean`
-- `pnpm publish`, `npm publish`
-- `rm -rf`, deleting any file outside `node_modules/`, `.next/`, `docs/reports/`
-- Any command touching `.env*` files (read or write)
-- Any network call other than `pnpm install` registry traffic
-- Modifying global `git config`, shell rc files, system PATH
-
-## R5. Commit hygiene
-
-- One commit per completed phase. Never amend.
-- Stage explicit paths only. Never `git add .` or `git add -A`.
-- Message: `phase(N): <slug> — <one-line>`. Body: bullet list of files + acceptance check results.
-- If pre-commit hook fails: fix root cause, re-stage, new commit. Never `--no-verify`.
-
-## R6. Acceptance gates
-
-- Phase is complete only when all checkboxes in `BUILDING_PLAN.md` Acceptance section evaluate true via reproducible commands.
-- Record the commands + outputs verbatim in `docs/reports/phase-N.md`.
-- A failed criterion = phase incomplete. Do not proceed. Do not "try harder later". Fix in current phase or escalate.
-
-## R7. Escalation protocol
-
-Stop work and write a single entry to `docs/BLOCKED.md` if any:
-
-- Acceptance criterion cannot be met after 3 honest attempts
-- Source of Truth contradicts itself or reality
-- Build fails for reason not caused by your last edit
-- A task needs a new dependency or scope change
-- You are about to do anything in R4 forbidden list
-
-Entry format:
-
-```
-## YYYY-MM-DD HH:MM — Phase N — <short title>
-- What I tried: ...
-- Why it failed: ...
-- What I need from human: ...
+```bash
+pnpm install
+pnpm dev
+pnpm dev:admin
+pnpm build
+pnpm start
+pnpm lint
+pnpm lint:fix
+pnpm format
+pnpm typecheck
+pnpm payload
+pnpm generate:types
+pnpm generate:importmap
+pnpm migrate
+pnpm migrate:create
+pnpm seed
+pnpm exec playwright test
+pnpm exec tsx --test tests/*.test.ts
+docker compose up -d
+docker compose ps
+git status
+git diff
+git add <explicit paths>
+git commit
 ```
 
-Then halt. Do not continue.
+Forbidden unless explicitly requested:
 
-## R8. State invariants (must hold at all times)
+- `git push`
+- `git reset --hard`
+- `git checkout -- .`
+- `git clean`
+- `git rebase`
+- `git commit --amend`
+- `--no-verify`
+- publishing packages
+- destructive deletes outside the requested scope
+- editing `.env.local` or other local secret files
 
-- `pnpm exec tsc --noEmit` exits 0
-- `pnpm exec next build` exits 0
-- `git status` shows no untracked files outside `docs/reports/`, `node_modules/`, `.next/`
-- No file in `src/` contains the strings `lorem`, `TODO!!`, `FIXME!!`, `XXX`, `HACK`
-- `src/lib/cms.ts` types unchanged unless SoT updated
+## Verification Gates
 
-Run a 30-second invariant check at the start and end of every task.
+Use fresh command output before claiming success:
 
-## R9. Style + design tokens
-
-- Colors: only via CSS vars in `globals.css @theme`. No raw hex in components.
-- Spacing: Tailwind scale only. No magic px values except for typographic clamp() ranges already established.
-- Fonts: only `font-display`, `font-serif-italic`, default mono. No new font families.
-- Motion: GSAP + Lenis only. No CSS transitions > 300ms on layout properties.
-
-## R10. Reduced-motion contract
-
-Every `useEffect` that animates **must** start with:
-
-```ts
-if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-  return;
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm exec tsx --test tests/*.test.ts
+pnpm exec playwright test
 ```
 
-If this guard is missing in any new motion code → phase incomplete.
+Docs-only changes normally require `pnpm typecheck`, `pnpm lint`, and `pnpm build`. Run unit/browser tests when docs changes are coupled to code or route behavior.
 
-## R11. Reporting
+## Architecture Guardrails
 
-End of every phase, write `docs/reports/phase-N.md` containing:
+- Keep `src/app/layout.tsx` bare.
+- Keep marketing and Payload route-group layouts separate.
+- Keep Payload imports out of client components and out of `src/lib/cms.ts`.
+- Normalize server CMS data through `src/lib/cms-server.ts`.
+- Preserve fallback fixture contracts in `src/lib/cms.ts`.
+- Update `docs/SOURCE_OF_TRUTH.md` when routes, collections, globals, API surfaces, env vars, or top-level architecture change.
 
-1. Phase number + name
-2. Files changed (paths only)
-3. Acceptance criteria, each w/ ✅ or ❌ + the verifying command output
-4. Anomalies / decisions made
-5. Backlog items added (if any)
-6. Time elapsed
+## Design Guardrails
 
-Then commit per R5.
+- Use color tokens from `src/app/globals.css`; avoid raw component hex values.
+- Use the existing font system.
+- Keep motion gated by `prefers-reduced-motion`.
+- Do not add analytics or third-party tracking without explicit approval.
+- Do not collapse public and admin shells.
 
-## R12. Communication style w/ human
+## Git Hygiene
 
-- Terse. No filler. No "I'll now proceed". No "great question".
-- Surface decisions, not narration. Show diffs, not prose.
-- One status line per phase completion: `phase(N) done — <key metric>`.
-
-## R13. Hard stop conditions (must halt agent)
-
-Halt if any:
-
-- `BLOCKED.md` has unresolved entry
-- Two consecutive build failures from agent edits
-- Network unreachable for `pnpm install`
-- Disk free < 500 MB
-- Repo HEAD diverges from agent's last known commit (someone else committed)
-
-## R14. Resumability
-
-- Agent must be able to resume after restart by reading `docs/reports/` to determine current phase.
-- Never store progress in memory only. Persist to `docs/reports/`.
-
----
-
-## Quick checklist before any code change
-
-- [ ] Read SoT section that governs this code
-- [ ] Read current file
-- [ ] Phase is in scope?
-- [ ] No new dep?
-- [ ] Reduced-motion guard if motion?
-- [ ] Token-based colors?
-- [ ] tsc + build pass after change?
-- [ ] Acceptance criteria still satisfiable?
+- Review `git status` and `git diff` before final response.
+- Stage explicit paths only if the user asks for staging or commit.
+- Do not revert unrelated user changes.
+- Do not remove generated or historical files unless the task asks for cleanup or they are proven stale for the task.

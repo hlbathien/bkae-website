@@ -130,9 +130,9 @@ export default function Hero() {
       </div>
 
       <Frame className="relative z-10">
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3 max-w-full flex-wrap">
           <span className="eyebrow-dot" />
-          <p className="eyebrow">Agentic Engineering · HCMUT · Founded 2026</p>
+          <p className="eyebrow break-words">Agentic Engineering · HCMUT · Founded 2026</p>
         </div>
 
         <h1
@@ -140,7 +140,7 @@ export default function Hero() {
           className="font-display text-[var(--color-ivory)] max-w-full"
           data-cursor="text"
           style={{
-            fontSize: "clamp(48px, 9vw, 152px)",
+            fontSize: "clamp(32px, 9vw, 152px)",
             lineHeight: 0.94,
             textWrap: "balance",
             wordBreak: "normal",

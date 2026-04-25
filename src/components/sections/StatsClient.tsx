@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import Frame from "@/components/primitives/Frame";
 import CountUp from "@/components/motion/CountUp";
+import RevealText from "@/components/motion/RevealText";
 import Sparkline from "@/components/primitives/Sparkline";
 import type { Stat } from "@/lib/cms";
 import { ensureGsap } from "@/lib/gsap";
@@ -55,10 +56,10 @@ export default function StatsClient({ stats }: { stats: Stat[] }) {
           data-stats-heading
           className="font-display h-display-l text-[var(--color-ivory)] mb-12"
         >
-          The receipts.{" "}
-          <span className="font-serif-italic text-[var(--color-amber)]">Counted.</span>
+          <RevealText splitBy="word">The receipts.</RevealText>{" "}
+          <RevealText splitBy="word" delay={0.15} className="font-serif-italic text-[var(--color-amber)]">Counted.</RevealText>
         </h2>
-        <div className="grid max-w-[1280px] grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid max-w-[1280px] grid-cols-1 gap-x-14 gap-y-16 sm:grid-cols-2 md:grid-cols-4">
           {stats.map((s, i) => {
             const sparkData = s.sparkline?.length
               ? s.sparkline
@@ -71,7 +72,7 @@ export default function StatsClient({ stats }: { stats: Stat[] }) {
                 <div
                   className="font-display text-[var(--color-amber)] stat-mask"
                   style={{
-                    fontSize: "var(--fs-stat-xl)",
+                    fontSize: "clamp(48px, 6vw, 88px)",
                     lineHeight: 1,
                     letterSpacing: "var(--tr-display-tight)",
                   }}
@@ -80,7 +81,7 @@ export default function StatsClient({ stats }: { stats: Stat[] }) {
                 </div>
                 <div
                   data-stat-label
-                  className="mt-3 eyebrow-sm text-[var(--color-steel-light)]"
+                  className="mt-3 eyebrow-sm text-[var(--color-steel-light)] break-words leading-tight"
                   style={{ clipPath: "inset(0 0 0 0)" }}
                 >
                   {s.label}

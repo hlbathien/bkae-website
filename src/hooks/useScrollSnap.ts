@@ -4,6 +4,19 @@ import { useLenisVelocity } from "@/hooks/useLenisVelocity";
 import { ScrollContext } from "@/components/chrome/SmoothScroll";
 import { usePathname } from "next/navigation";
 
+const SCROLL_JACK_SECTIONS = new Set(["projects", "process"]);
+
+function isScrollJackSectionInViewport() {
+  const viewportHeight = window.innerHeight;
+  return Array.from(document.querySelectorAll<HTMLElement>("section[data-section]")).some((sec) => {
+    const tag = sec.getAttribute("data-section");
+    if (!tag || !SCROLL_JACK_SECTIONS.has(tag)) return false;
+
+    const rect = sec.getBoundingClientRect();
+    return rect.top < viewportHeight * 0.72 && rect.bottom > viewportHeight * 0.28;
+  });
+}
+
 export function useScrollSnap() {
   const { lenis } = useContext(ScrollContext);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -12,33 +25,36 @@ export function useScrollSnap() {
   const handleSnap = useCallback(() => {
     if (!lenis) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isScrollJackSectionInViewport()) return;
 
     const sections = document.querySelectorAll<HTMLElement>("section[data-section]");
-    let closestTop = Infinity;
+    let bestDist = Infinity;
+    let bestTop = 0;
     let targetElement: HTMLElement | null = null;
-    
+
     sections.forEach((sec) => {
+      // Skip pinned/scroll-jack sections — Projects + Process own scroll.
+      const tag = sec.getAttribute("data-section");
+      if (tag && SCROLL_JACK_SECTIONS.has(tag)) return;
       const rect = sec.getBoundingClientRect();
-      if (Math.abs(rect.top) < Math.abs(closestTop)) {
-        closestTop = rect.top;
+      const d = Math.abs(rect.top);
+      if (d < bestDist) {
+        bestDist = d;
+        bestTop = rect.top;
         targetElement = sec;
       }
     });
 
     if (!targetElement) return;
 
-    // Disabled for first 300px after a section top
-    // (i.e. if viewport is 0-300px down from section top)
-    if (closestTop < 0 && closestTop >= -300) {
-      return;
-    }
-
-    if (Math.abs(closestTop) > 5 && Math.abs(closestTop) < 800) { // arbitrary threshold to avoid wild jumping across the whole page
+    // Only snap if very close (≤ 180px). Prevent yanking user across page.
+    if (bestDist > 5 && bestDist < 180) {
       lenis.scrollTo(targetElement, {
-        duration: 1.2,
+        duration: 0.9,
         offset: 0,
       });
     }
+    void bestTop;
   }, [lenis]);
 
   const handleVelocity = useCallback((v: number) => {
